@@ -1,4 +1,4 @@
-rickeyre.github.io
+Rick Eyre's Blog
 ==================
 
 Personal webpage and blog.
