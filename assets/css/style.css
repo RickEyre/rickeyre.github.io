@@ -19,8 +19,6 @@ small.tag-line {
   font-size:22.5px;
 }
 
-div.page-header .no-border {
-  border-bottom:0px none;
-  padding-bottom: 0px;
-  margin: 20px 0px 10px;
+div.main-header {
+  margin: 20px 0px 20px;
 }
