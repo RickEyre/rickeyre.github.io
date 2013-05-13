@@ -1,0 +1,26 @@
+html, body {
+  background-image: url(../img/background/grey-grid.png);
+  background-repeat: repeat;
+}
+
+body {
+  padding-top:10px;
+}
+
+footer {
+  padding-top:40px;
+  text-align:center;
+}
+
+small.tag-line {
+  font-weight:normal;
+  line-height:1;
+  color:#999;
+  font-size:22.5px;
+}
+
+div.page-header .no-border {
+  border-bottom:0px none;
+  padding-bottom: 0px;
+  margin: 20px 0px 10px;
+}

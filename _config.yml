@@ -3,7 +3,7 @@
 markdown: rdiscount
 permalink: date
 
-exclude: README.md
+exclude: [README.md]
 timezone: Canada/Eastern
 
 # Site wide variables
