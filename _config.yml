@@ -1,8 +1,6 @@
 # Config options
-
 markdown: rdiscount
 permalink: date
-
 exclude: [README.md]
 timezone: Canada/Eastern
 
