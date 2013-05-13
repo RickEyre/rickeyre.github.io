@@ -4,7 +4,6 @@ layout: main
 
 Richard Eyre
 ============
-************
 Oh hai, I didn't see you there.
 
 I'm Richard Eyre, a Software Developer working in the open-source community --
