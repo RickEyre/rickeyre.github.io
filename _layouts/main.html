@@ -4,5 +4,13 @@
     <title> {{ site.title }} </title>
     {% include includes.html %}
   </head>
-  {% include body.html %}
+  <body>
+    {% include header.html %}
+    <div class="row-fluid">
+      <div class="span6 offset3">
+        {{ content }}
+      </div>
+    </div>
+    {% include footer.html %}
+  </body>
 </html>
