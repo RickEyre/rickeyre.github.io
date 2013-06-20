@@ -45,8 +45,13 @@ ul {
   margin: 20px 0px 20px;
 }
 
-.coming-soon {
+.centered {
   display: block;
   margin-left: auto;
   margin-right: auto;
+}
+
+.video {
+  padding-top: 10px;
+  padding-bottom: 25px;
 }

@@ -1,0 +1,43 @@
+---
+layout: post
+title: Kyle's Cycle Collector Talk -- With WebVTT!!
+tags:
+- CDOT
+- cdot
+- mozilla
+- Mozilla
+- nightly
+- Open Source
+- Seneca College
+- seneca college
+- software
+- specification
+- technology
+- text track
+- track
+- w3c
+- webvtt
+- WEBVTT
+- whatwg
+- demo
+- DEMO
+status: publish
+type: post
+published: true
+---
+
+<p>So a week or so ago <a href="http://blog.pearce.org.nz/">Chris Pearce</a> posted a video of a talk on the Gecko cycle collector that <a href="http://blog.kylehuey.com/">Kyle Huey</a> did in Taiwan during Mozilla's Web Rendering week (May 2013). Seeing as how it's a treasure trove of information on the cycle collector we thought, well <a href="http://vocamus.net/dave/">Dave Humphrey</a> thought, that it would be a great video to help show off the new WebVTT support that we've landed in Firefox Nightly so far. It's also great because having subtitles on this video makes all this great information on the Gecko cycle collector more accessible to the web and that is exactly what WebVTT aims to do... as well as Karaoke.</p>
+
+<p>If you'd like some background information on cycle collection you can check out <a href="http://media.junglecode.net/media/Bacon01Concurrent.pdf">this paper</a> that Kyle provided everyone with at the Taipei meeting before he did the talk. It's pretty interesting, but packed full of technical things, so beware!</p>
+
+<p>To run this make sure you have an up to date Nightly build and turn the webvtt pref on before playing the video. To do this browse to "about:config" in the URL bar, then search for webvtt on the page displayed, and double click on the result to flip it to true. Your browser should now be ready to play WebVTT subtitles!</p>
+
+<p>So without further ado I present to you the fully subtitled cycle collector talk. I'd like to thank <a href="http://marcusvsaad.wordpress.com/author/marcusvsaad/">Marcus Saad</a> for helping me subtitle this beast as well. For those of you who have never subtitled before, it's a long process. We had to do this one manually as well since there are no tools currently that help with subtitling videos in WebVTT. So one minute of this video took about 5 - 8 minutes to subtitle.</p>
+
+<video class="video centered" src="http://people.mozilla.org/~rgiles/2013/khuey-cycle_collector-sd.webm" controls>
+  <track src="../assets/media/captions/cycle-collector.vtt" kind="subtitles" default />
+</video>
+
+<p> You can check out the full WebVTT file <a href="http://github.com/RickEyre/rickeyre.github.io/assets/media/captions/cycle-collector.vtt">here</a>. Feel free to do pull requests against my repo if we messed up some subtitles, or your upset at my horrible grammar, or the timings are off, and it's driving you crazy.</p>
+
+<p>There's still a ton of work left to do on WebVTT so we're looking for new contributors. If you'd like to help out head over to the <a hre"https://wiki.mozilla.org/WebVTT">WebVTT page</a> on the Mozilla Wiki where there is more information about how to do that.</p>
