@@ -1,0 +1,172 @@
+---
+layout: post
+title: WebVTT 0.2 Release Update - Oct 26, 2012
+tags:
+- c parser
+- c string functions
+- naming conventions
+- Open Source
+- seneca
+- Seneca College
+- software
+- technology
+- utf-8
+- w3c specification
+- webvtt
+- WEBVTT
+status: publish
+type: post
+published: true
+meta:
+  _wpas_done_1604135: '1'
+  publicize_reach: a:3:{s:7:"twitter";a:1:{i:1604132;i:5;}s:2:"fb";a:1:{i:1575533;i:215;}s:2:"wp";a:1:{i:0;i:7;}}
+  _wpas_done_1575533: '1'
+  _publicize_done_external: a:1:{s:8:"facebook";a:1:{i:503100574;b:1;}}
+  publicize_twitter_user: epsilon812
+  _wpas_done_1604132: '1'
+  _wpas_skip_1575533: '1'
+  _wpas_skip_1604132: '1'
+  _wpas_skip_1604135: '1'
+  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2012-10-26
+    18:11:41";}
+---
+So my partner and I, <a href="http://zaf1.wordpress.com/">Shayan Zafar</a>, have been hard at work on the 0.2 release of our C parser. We've done a lot of work on it. I'll briefly go over some of the changes we have made.
+
+We presented our <a href="http://epsilon812.wordpress.com/2012/10/18/webvtt-0-2-release-update/">initial code</a> and development to our class last Thursday and we got quite a few good comments on how to improve the code, all of which we later implemented:
+<ul>
+	<li>Change the naming conventions we were using to more C style naming conventions. At the time we were using camel case to name our variables but this is not the way you do it in C. In C you usually name your variable and function names all lower case with _ to separate words.</li>
+	<li>Change some while loops that we had that could be changed into for loops and simplified.</li>
+	<li>Change our error logging system to be contained within our WebVTT buffer info struct instead of as a global variable.</li>
+	<li>Change one function that we used to advance a pointer past a single line ending to advance past any number of line endings that might occur.</li>
+	<li>Change our error logging code to be able to take in a -debug command on the command line in order to tell the program whether or not it needs to log errors.</li>
+</ul>
+The class was also really good because it got me thinking of all the things that we would need to be thinking about for our final implementation, such as the program being <a href="http://en.wikipedia.org/wiki/UTF-8">UTF-8</a> compliant. The Prof pointed out to us certain functions that we were using, such as many C string functions, which would not behave the way we would want when using UTF-8.
+
+Overall from the class I began to realize how much harder this is going to be then what I was originally expecting.
+
+There was also a comment from the Prof about possibly squashing the data structure that we made with structs because many of them contain the same data. As of yet I'm still thinking about what is the best thing to do. What will help is when we are able to begin to actually write the code that will be parsing a text track cue text. At that time we will be able to see how the data structure will fit in to our current C parser implementation and so we will be able to see what can be thrown away or changed more easily.
+
+I'm hoping that my partner and I can finish the parser by this Monday... we have the majority of it done so far. However, some of the hardest parts are left such as parsing the text track cue text. Even if we don't finish it I will still be happy that we can deliver what we have done so far. It doesn't help that I also have a test coming up on that Monday followed by an assignment for another class due on the Tuesday...
+
+The most interesting thing I did this week was to begin to work on a UTF-8 library that we can rely on for our C parser. To give you an overview of UTF-8:
+<ul>
+	<li>UTF-8 'characters' are called code points.</li>
+	<li>Each code point consists of a variable amount of bytes.</li>
+	<li>UTF-8 code points consist of one leading byte and a variable amount of continuation bytes.</li>
+	<li>A UTF-8 leading byte has two or more high order ones followed by a zero.</li>
+	<li>A UTF-8 continuation byte has one high order ones followed by a zero.</li>
+	<li>The amount of high order ones in a leading byte denotes how many continuation bytes there should be in the code point.</li>
+</ul>
+For more information you can checkout <a href="http://en.wikipedia.org/wiki/UTF-8#Description">this</a>.
+
+The bulk of the UTF-8 code that I wrote for the library is within one function:
+
+[sourcecode language="cpp"]
+int is_utf8_code_point(char *s) {
+	int i, required_number_of_bytes = 0;
+	/* These variables hold the values that allow the program to check if the first byte of a UTF8 code point conforms to the specification. */
+	char code_point_start = MAX_UTF8_CODE_POINT_IDENTIFIER,  code_point_start_and = MAX_UTF8_CODE_POINT_IDENTIFIER_AND;
+
+	/*
+	* UTF8 specifies a maximum of 6 bytes to be used in a code point.
+	* This will check the first byte of a code point to see if it conforms to any one of the code point byte identifiers.
+	* It starts with the maximum byte identifier available and shifts the bits to the left each iteration to check the next highest code point identifier.
+	* If it reaches lowest code point identifier possible it will return a fail.
+	*/
+	for (i = 6; i &gt; 1; i--) {
+		if (*s &amp; code_point_start_and == code_point_start) {
+			required_number_of_bytes = i;
+			s++;
+		} else {
+			code_point_start &lt;&lt;= code_point_start;
+			code_point_start_and &lt;&lt;= code_point_start_and;
+		}
+	}
+
+	/*
+	* If we didn't find the required number of bytes that this code point specifies then that means that we did not find a valid UTF8 code point identifier.
+	*/
+	if (!required_number_of_bytes)
+		return 0;
+
+	/*
+	* This will loop through the required number of bytes that the code point identifier needs as specified by UTF8.
+	* It starts at 1 because the code point identifier byte has already been found and counted.
+	* If each one of the bytes within the code point does not start with the hex value 10XX XXXX, where X represents possible bits to encode the character, than it will return a fail.
+	*/
+	for (i = 1; i &lt; required_number_of_bytes; i++) {
+		if (*s == NULL_BYTE)
+			return 0;
+		if (*s &amp; UTF8_CODE_POINT_INTERNAL_BYTE_IDENTIFIER_AND == UTF8_CODE_POINT_INTERNAL_BYTE_IDENTIFIER)
+			s++;
+		else
+			return 0;
+	}
+
+	return required_number_of_bytes;
+}
+[/sourcecode]
+
+The function determines if the passed char array contains a UTF-8 code point. It assumes that the first char pointed to is the leading byte. It will then do a series of &amp; operations on the leading byte to determine if it has the proper amount of high order bits and zeros. If it finds a match it will then loop through the continuation bytes to see if the amount of continuation bytes that the leading byte requires is met.
+
+Some things to note:
+<ul>
+	<li>This code is completely untested right now. I have no idea if it is completely correct or if there are bugs in it. I might get the chance to start working with it before Monday.</li>
+	<li>I don't know if this is the most efficient way to check for a code point. When it looks for a proper leading byte it starts by comparing the highest number of high bits that a leading byte could have and then proceeds to bit shift left until a match is found or it gets to the lowest amount possible. I was thinking that it might be better to start at the lowest amount of high order bits and then checking the next highest, but this would take more arithmetic then a simple bit shift.</li>
+</ul>
+Using this function I can do all kinds of things such as:
+
+Calculate the length of a UTF-8 string in code points:
+
+[sourcecode language="cpp"]
+int utf8_string_length(char *s) {
+	int i;
+
+	for (i = 0; *s != NULL_BYTE; i++) {
+		if (!is_utf8_code_point(s))
+			return -1;
+	}
+
+	return i;
+}
+[/sourcecode]
+
+Check whether or not a string is UTF-8:
+
+[sourcecode language="cpp"]
+int string_is_utf8(char *s) {
+	while (*s != NULL_BYTE) {
+		if (!is_utf8_code_point(s))
+			return 0;
+	}
+
+	return 1;
+}
+
+[/sourcecode]
+
+Retrieve a sub string from a UTF-8 string:
+
+[sourcecode language="cpp"]
+int utf8_substring(char *source, char *out, int number_of_code_points) {
+	int byte_size = utf8_string_length_in_bytes(source, number_of_code_points);
+
+	if (byte_size == -1)
+		return 0;
+
+	out = (char *)malloc(sizeof(char) * byte_size);
+	strncpy(out, source, byte_size);
+
+	return 1;
+}
+[/sourcecode]
+
+These functions are also untested, hopefully I will get the time to test them soon.
+
+Even if we don't end up using this code and instead we go with some open source UTF-8 library, this will have been one of the most fun things I have done so far this year. It's very rare that I ever get to work with individual bits and bytes at my job or on projects. Most programming languages today are very high level and such low level things are already taken care of for you.
+
+I also did other miscellaneous things such as organizing code better, filling in comments, fixing bugs, filling in utility functions we will need such as functions to create and destroy structs, etc.
+
+The next two major things my partner and I will be working on from now until Monday are the last two things we will need to do for our 0.2 release. Those are parsing the text track cue text and parsing the time stamp and settings.
+
+See yah!

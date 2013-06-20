@@ -1,0 +1,63 @@
+---
+layout: post
+title: Linux Install.. Finally
+tags:
+- dual boot
+- linux
+- linux mint
+- Open Source
+- operating system
+- Seneca College
+- software
+- ubuntu
+status: publish
+type: post
+published: true
+meta:
+  _wpas_done_1604135: '1'
+  _wpas_done_1575533: '1'
+  _wpas_done_1604132: '1'
+  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2012-09-30
+    17:30:36";}
+---
+So I was finally able to get a Linux distribution installed on my computer successfully and not have it crashing all the time. I don't have much time today so I'm just going to quickly enumerate some things that I learnt and/or found interesting.
+
+<strong>Dual Booting Systems and your MBR</strong>
+
+This whole project made me deal with and think about MBRs and boot sections. I ran into a bunch of problems because I didn't understand/research about the proper way to manage your MBR and boot sections. There are two things you need to think about - where is the boot manager for a particular system going to be stored and what software are you going to use in order to provide a boot loader that can choose between your two or more operating systems.
+
+The two situations in which I had to deal with this were - when installing Linux you have to specify a partition on the hard drive where <a title="GRUB2" href="https://wiki.ubuntu.com/Grub2">GRUB2</a> (Linux's boot loader) will be installed and when I erased Ubuntu before changing GRUB back to the Windows boot loader.
+
+Grub is Linux's default boot loader. One of the good things about it is that it supports dual booting straight out of the box. When you install Linux one of the questions it asks you is where it should install GRUB. On my first try to install Linux I made the mistake (?) of installing GRUB on the 100 MB system reserve that houses Windows 7 boot loader. From the online tutorials I got the understanding that this is the correct place to put GRUB. It should erase the Windows 7 boot loader, replacing it with GRUB, and should automatically find the Windows 7 section of your hard disk and put a record in it's boot list for it. However, this did not happen for me. I could boot into Linux no problem, but Windows was another matter. I ended up resolving this by running something called <a title="Boot Repair" href="https://help.ubuntu.com/community/Boot-Repair">Boot Repair</a> which automatically resolves any issues in GRUB. After I ran it I was able to boot into Windows but I had one problem. There were two entries for Windows in the boot list. One which worked and one which didn't. I was researching ways to delete the incorrect entry from GRUB when I decided to get rid of the Ubuntu install because it kept crashing and freezing up.
+
+I once again tried to dual boot Ubuntu. The previous time I had chosen the option in the Linux installer to manually install Linux. This time I tried it's automatic option "Install Linux Alongside Windows". Everything went perfectly during the install. The only problem was that Ubuntu kept crashing... and freezing. Sigh.
+
+This is where I ran into my second problem. I erased the Ubuntu partition before replacing GRUB with the old Windows boot loader. This meant that I was no longer able to boot into anything. My computer would start up and GRUB would come up with an error telling me it can't find Linux.
+
+I inserted my Windows CD and tried start-up repair, but that didn't work. After trying many options I came across this <a href="http://www.sevenforums.com/tutorials/20864-mbr-restore-windows-7-master-boot-record.html">tutorial</a>. Following it I was finally able to get back into Windows 7. What you have to do in order to replace your Windows 7 boot loader is to start up from your Windows 7 CD and open the command prompt. You then issue a series of commands that will load the Windows 7 boot loader back onto the appropriate section of your hard drive.
+
+<strong>Ubuntu and Unity</strong>
+
+One of the things that I began to be suspicious about when reading about and troubleshooting Ubuntu was that there might be an issue with Unity. Unity is Ubuntu's, relatively new, desktop GUI.
+
+What made me suspicious is that each time Ubuntu would freeze I would still be able to get to the command terminal by pressing F2... well one of the F keys, I don't remember. So I began to be suspicious of the possibility that it was Unity that was freezing and not Ubuntu itself.
+
+<strong>Linux Mint</strong>
+
+After all this I decided to maybe try another Linux distribution. I Googled for a list of the top ten for 2012 and Linux Mint came out on top on many a list. It is based on Debian and is available in KDE, Cinnamon, Mate, and Xfce, versions. When looking at the screenshots of it I liked the look of the Cinnamon version much better than the look of Unity. This is because the Cinnamon desktop looks similar to Windows whereas Unity looks similar to Apple. I'm most used to Windows as an operating system and after owning an iPhone and a MacBook Pro for a while I am beginning to not like Apple that much these days.
+
+I know in terms of Ubuntu being Unity and Mint being Cinnamon it doesn't change much of the underlying system in Linux because Mint is built on Ubuntu, but hey... the software you use should look good.
+
+This time when I installed Mint I chose to install it on one of my secondary hard drives and not my main C drive. I also allowed space in the partition for a /boot section for GRUB and didn't erase Windows 7 boot loader. The final thing I did was add an entry in Windows boot loader for Mint using <a title="EasyBCD" href="http://download.cnet.com/EasyBCD/3000-2094_4-10556865.html">EasyBCD</a>. Since than everything has been running smoothly. No crashes from either operating system.
+
+You can follow this <a href="http://www.linuxbsdos.com/2012/06/06/how-to-dual-boot-linux-mint-13-cinnamonmate-and-windows-7/">tutorial</a> for help.
+
+There are a few things going against Mint right now.
+
+The first is that it doesn't have the same support as Ubuntu. It doesn't have as big of a community and not many pre-made packages in it's software management app. For example: Chrome wasn't there, and things like GIT and Skype wouldn't install correctly from it. This isn't much of a problem because you can just manually download the package through command line or internet browser.
+
+The other issue I've had with it so far is that it doesn't automatically detect my second screen, which is an HDTV. Ubuntu did it automatically.
+
+Other than that Mint is pretty awesome. Maybe I will try Ubuntu again and see if it runs better running in the same configuration that I have Mint on now. We will see.
+
+That's all for now!

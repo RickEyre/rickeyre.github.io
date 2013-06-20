@@ -1,0 +1,50 @@
+---
+layout: post
+title: 'WEBVTT: Initial Support Incoming'
+tags:
+- CDOT
+- git
+- hg
+- hg mq
+- htmltrackelement
+- mozilla
+- Mozilla
+- Open Source
+- pref
+- prefs
+- seneca
+- Seneca College
+- seneca college
+- software
+- technology
+- text track
+- track element
+- w3c
+- webvtt
+- WEBVTT
+- whatwg
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  _wpas_done_1604135: '1'
+  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2013-06-08
+    03:57:30";}
+  publicize_twitter_user: epsilon812
+  _wpas_done_1604132: '1'
+  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:384903786;b:1;}}
+---
+I have some great news. Bug <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=833382">833382</a> and <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=833386">833386</a>, the last pieces needed to get initial support for WEBVTT into Gecko will be landing for sure next week. That being said, I hope I don't have to eat my words. It's looking really good though. Bug 833382 has gotten to the point where <a href="https://twitter.com/bz_moz">Boris</a> (:bz) has conditionally r+'ed it and 833386 has reached the same point with <a href="https://twitter.com/rillian">Ralph</a> (:rillian). Now all that's left to do for 833382 is to spin up some try builds and if it's all green, hopefully we'll be good to go. 833386 still needs to go through review with <a href="https://twitter.com/chrisryanpearce">Chris Pearce</a> (:cpearce), but I don't think that will take that long.
+
+I've been pushing really hard on landing these two this last week and I'm ecstatic to see that we've gotten to the point where we will be landing them in the next few days. The WebVTTLoadListener in particular I'm very happy about as most of that code is mine and I've worked really hard at it. It'll feel good to land that. In the case of 833386 most of that code is Jordan Raffoul's (:jbraffoul) and Marcus Nsaad's (:msaad) and the work I did on it was just to consolidate it and get it through the last couple rounds of review. Marcus had been on vacation for a while and we really wanted to get this landed ASAP as it is blocking quite a few things so I asked Marcus if I could step in and he didn't have a problem with it (Yay Marcus!).
+<h2>Tests, Tests</h2>
+One of the biggest problems I was having with the tests for the HTMLTrackElement and TextTrack* DOM classes (833386) was that we wanted to test everything with the pref set to true and also with it set to false. The thinking here was that we could do it in the same file. The problem was that it wasn't working... and we all thought that it should be possible to do so I spent about 2~3 days trying to get it to work. At first I suspected that it was due to closures in Javascript and that the 'state' or variables were being sustained somehow by this. There was no way to get out of being entangled in closures too as we need to use a particular function, <a href="https://mxr.mozilla.org/mozilla-central/search?string=pushPrefEnv">SpecialPowers.pushPrefEnv</a>, that takes a function argument and async calls it after the pref is set. So in order for us to test with true and then false we have to have one pushPrefEnv(true) and one pushPrefEnv(false) with the second embedded in the first so that they are called one after the other and in that way we have a definitive point where we can call SimpleTest.finish().
+
+I finally figured out, when asking the right people (bz and Ms2ger, who woulda' thunk?), that it's actually impossible to test with two different prefs in one page as there is one prototype for each element on the page and the pref is only applied to it once, when the element is created for the first time. So once you've created an element underneath one pref on a page, that's it, it will behave like it is preffed that way no matter what you do. After that it was pretty quick to get through the rest of the code needed. One of the really good things about this process too is that it allowed me to find a lot of points where our current implementation is not to spec. I've <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=879426">filed</a> a <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=879431">few</a> <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=880064">bugs</a> on those this week. I've also closed a few <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=871184">bugs</a> that have been fixed with changes in the last while. I also spun off another <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=880713">bug</a> for tests that we will need to implement when the WEBVTT pref finally gets removed.
+<h2>Try Server Access</h2>
+The other really awesome news is that I've finally got try server access! Earlier this week Daniel Holbert (:dholbert) suggessted that I should apply for it and that he would vouch for me. I probably should have applied for it sooner then this as I could have used it for sure. The process was fairly easy and I'm glad to say I now have <a href="http://www.mozilla.org/hacking/commit-access-policy/">Level 1 commit access</a>. <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=878846">Woot</a>! If your interested in applying as well check out <a href="http://www.mozilla.org/hacking/committer/">this page</a> that describes what you will need to do.
+
+In accordance with this new awesomeness I also had to learn about the process of pushing to the try server. Check out this good <a href="https://wiki.mozilla.org/ReleaseEngineering/TryServer">page</a> for more information on how to do that. You'll also probably want to look at <a href="http://mercurial.selenic.com/wiki/MqExtension">Mercurial Manage Queue</a> extension as it helps with managing a bunch of patches that you can move in and out of your branches easily. This really works well with my workflow of working on git and then just applying patches on my hg repository and pushing to the try server.
+
+Until next time.

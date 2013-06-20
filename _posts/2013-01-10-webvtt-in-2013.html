@@ -1,0 +1,47 @@
+---
+layout: post
+title: WEBVTT in 2013
+tags:
+- c
+- gecko
+- Open Source
+- parser
+- Seneca College
+- software
+- software-development
+- technology
+- w3c specification
+- webvtt
+- WEBVTT
+status: publish
+type: post
+published: true
+meta:
+  _publicize_done_external: a:1:{s:8:"facebook";a:1:{i:503100574;b:1;}}
+  publicize_reach: a:3:{s:7:"twitter";a:1:{i:1604132;i:22;}s:2:"fb";a:1:{i:1575533;i:218;}s:2:"wp";a:1:{i:0;i:8;}}
+  _wpas_done_1604135: '1'
+  _wpas_done_1604132: '1'
+  publicize_twitter_user: epsilon812
+  _wpas_done_1575533: '1'
+  _publicize_pending: '1'
+  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2013-01-10
+    02:30:15";}
+  _wpas_skip_1575533: '1'
+  _wpas_skip_1604132: '1'
+  _wpas_skip_1604135: '1'
+---
+So after a vacation that wasn't long enough it is a new semester and that means, you guessed it, more WEBVTT development! We had our first class and have roughly got an idea of what we need to do and the direction that we need to head in.
+
+This semester I will still be contributing to the WEBVTT parser on and off, but the bulk of my focus will be turned towards getting it to work with Gecko which is the layer in Firefox that will be utilizing it. I don't know much about Gecko or the Firefox code base yet so learning that is a major hurtle I'm going to face this term.
+
+Our class is working within two week development time frames and we will need to be doing three demos of what we have done to the class. I've signed up for my three demo time slots and these are roughly the gaols that I'd like to meet for those demos:
+<ul>
+	<li><strong><span style="line-height:13px;">January 28: </span></strong><span style="line-height:13px;">I will have the refactored changes done to the parser that I discussed in my previous blog post; I'll have compiled Firefox and gotten a basic understanding of the direction I need to be headed in for Gecko.</span></li>
+	<li><strong>March 4: </strong>A good understanding of Gecko and the Firefox code base; I'll have written the first one or two Gecko integration iterations; I'll have communicated any design changes that I think the parser needs to make in order to work with Gecko easily to the team.</li>
+	<li><strong>April 1: </strong>I'll have gotten the Gecko integration to a good place to ship in 1.0</li>
+</ul>
+Some of the problems that I think I will have are mainly with getting started on the integration with Gecko. I've never looked at Gecko before so I'm coming into this with no idea of how the Firefox code fits together. I predict that I will probably have to ask questions of people in the know who have worked on it before, so that means that I am going to need to go out and talk to people in the community. After I get rolling on the code and have a better understanding it'll probably be more easy going.
+
+The biggest amount of work that I see us doing this semester in terms of incorporating the parser into Gecko is changing the parser based on our new knowledge of how it is going to fit into Gecko. Once it's in there we will be able to see more clearly how the end architecture of the parser should be. This means that we will probably have a few changes to the public API and architecture of the parser.
+
+There are a few areas to tackle in getting this parser done and we've all decided to own one part of it or the other. Even though we've done this I suspect that we will eventually contribute to all aspects of the code in small ways. We will have to work as a close knit team and help each other out in order to get the WEBVTT parser to 1.0 by the end of the term.

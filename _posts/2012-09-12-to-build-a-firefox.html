@@ -1,0 +1,75 @@
+---
+layout: post
+title: To Build a FireFox
+tags:
+- firefox
+- linux
+- mozilla
+- Open Source
+- Seneca College
+- software
+- Tech
+- ubuntu
+- WEBVTT
+status: publish
+type: post
+published: true
+meta:
+  _wpas_done_facebook: '1'
+  _wpas_done_twitter: '1'
+  _wpas_mess: To Build a FireFox http://wp.me/p2IPAS-R
+  _wpas_skip_linkedin: '1'
+  tagazine-media: a:7:{s:7:"primary";s:71:"http://epsilon812.files.wordpress.com/2012/09/nightly-firefox-build.png";s:6:"images";a:1:{s:71:"http://epsilon812.files.wordpress.com/2012/09/nightly-firefox-build.png";a:6:{s:8:"file_url";s:71:"http://epsilon812.files.wordpress.com/2012/09/nightly-firefox-build.png";s:5:"width";i:1920;s:6:"height";i:1080;s:4:"type";s:5:"image";s:4:"area";i:2073600;s:9:"file_path";b:0;}}s:6:"videos";a:0:{}s:11:"image_count";i:1;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2012-09-13
+    01:45:08";}
+  _ideation_attached_images: '54'
+  _wpas_skip_1604135: '1'
+  _oembed_deb025f4a7685fe97bb572b2b8a08d83: '{{unknown}}'
+  _oembed_8315b6b3de1e0473d96ab0e39d05b4c5: '{{unknown}}'
+---
+Hello out there! I am back as promised today to talk about my journey of trying to build <a title="FireFox" href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">FireFox</a> - one of the worlds most popular web browsers. I am doing this for my Open Source Software course as a first step along the path to being able to contribute to the project that my class will be working on this semester. That project is to implement the <a title="WebVVT" href="http://dev.w3.org/html5/webvtt/" target="_blank">WebVVT</a> standard in FireFox.
+
+<strong>The Decision</strong>
+
+My first idea in class when my Professor talked about building FireFox was to build it on Windows (even though it's a lot easier to build it on Linux as that is its native OS. However, as I began to think more about it I decided that I would install a Linux version and try to build it on that. I thought to myself that if I was going to start doing the whole Open Source Software thing that I would just dive right in and start learning all about Linux as well. I have had some experience in the past with versions of Linux but nothing substantial. I am definitely a beginner.
+
+<strong>The Adventure</strong>
+
+So it was that I found myself searching Google for easy ways of installing a version of Linux and being able to dual boot it from my Windows 7 PC. I stumbled upon this Ubuntu tool, called <a title="Wubui" href="http://www.ubuntu.com/download/desktop/windows-installer" target="_blank">Wubui</a>, that would download Ubuntu, partition my main drive, and install Ubuntu all by itself. Sounds pretty awesome doesn't it?!
+
+My first order of business was to download the Wubui installer. After I downloaded that I also downloaded the Ubuntu ISO because I had it stuck in my mind that I would need this at some point to install Ubuntu (even though Wubui is supposed to install Ubuntu by itself, without the ISO). I ran the Wubui installer and it ran all the way through and asked me to reboot my system to complete the install. This is where I encountered my first problem. As Ubuntu was trying to complete the installation it crashed. I tried again and it crashed. I tried again, this time with a CD with the Ubuntu ISO on it. It seemed to do a little bit better, but it still crashed. After this I started looking through the documentation, upon which I realized that I didn't need the ISO because Wubui would download and install Ubuntu itself. I thought about this some more and I realized Wubui had not been downloading and installing Ubuntu. It had just been passing through that part. After a couple seconds thinking about this it dawned on me that the ISO contained within the same directory as the Wubui installer might be messing it up. I went to my downloads directory, deleted the ISO, ran the Wubui installer, and voila - it downloaded and installed it. For some reason the ISO in the same directory as the Wubui installer was messing it up. I don't know why this was the case - maybe some feature I don't know about. After that, I went to boot into Ubuntu and everything worked fine. I was working on a brand spanking new Ubuntu OS.
+
+You might think that this was the last of my problems but alas... it wasn't.
+
+As I began to use Ubuntu strange things would happen. It kept freezing, sometimes crashing. I would try to install software from it's 'software manager app' and it would fail and give me an error about not having the right libraries. In spite of this I started to make head way. I downloaded <a title="Git" href="http://git-scm.com/" target="_blank">Git</a> and began to clone my own mozilla-central fork. But in the middle of cloning mozilla-central it began to hang. I tried again and again but always it would hang. After this I decided to uninstall Wubui and reinstall it. No luck. It kept having the same problems with the <em>crashing</em>, and the <em>libraries</em>, and the <em>hanging</em> <em>up</em>. <strong>Agh!</strong> Eventually I decided that I didn't have the time or patience to go into detail and figure out what was really going wrong in the underlying system and that I would instead build FireFox on Windows and that at a later date I will create a real genuine dual boot with Ubuntu without using Wubui.
+
+<strong>Good Ol' Windows</strong>
+
+Thus, I began to gather the the things that I would need to build FireFox on Windows. Most of it I didn't have as I recently reformatted my main hard drive. I had to install <a title="Visual C++ 2010" href="http://www.microsoft.com/en-ca/download/details.aspx?id=5555" target="_blank">Visual C++ 2010</a> (which I got from installing Visual Studio 2010), <a title="Git" href="http://git-scm.com/" target="_blank">Git</a>, <a title="DirectX SDK (June 2010)" href="http://www.microsoft.com/en-ca/download/details.aspx?id=8109" target="_blank">DirectX SDK (June 2010)</a>, and the Mozilla Build Package, which can be found (among other helpful documentation) at: <a href="http://mzl.la/PIxoX4" target="_blank">http://mzl.la/PIxoX4</a>.
+
+After this I cloned my mozilla-central fork on GitHub to my computer. Then I fired up the command terminal that simulates a linux environment which comes with the Mozilla Build Package. It can be found at the default directory path:
+<blockquote>C:\mozilla-build\start-msvcX
+
+(where X is the version of VC++ you have)</blockquote>
+After this I navigated to my mozilla-central repository on my computer through the terminal and issued the command to build FireFox:
+<blockquote>python build/pymake/make.py -f client.mk -jN
+
+(where N is the amount of cores you want to use to build it)</blockquote>
+It crashed immediately.
+
+It spouted out some stuff about needing the line endings of the repository to be LF normalized line endings (which are used in Linux). I was using the 'glorious' CRLF line endings of Microsoft. I face palmed because I had been thinking about this when Git asked me what I wanted to do about line endings during the install. I chose to keep the CRLF line endings even though I thought that I might run into this problem.
+
+I didn't feel too bad because the error cited a tool that I could use to fix the problem. It was supposedly called dos2unix and was located right in my very own repository. I decided that I would use it. I tried the command the error had suggested to me to run the program... but no dice. Apparently, mozilla doesn't even have this utility anymore in the FireFox repo - it was messed up or something so they took it out, but <em>they still tell you to use it</em>. It took me a couple minutes to figure this out. I eventually talked with a friend who told me he had the same problem and that he had read that they had taken it out. So I began to look around for ways to fix this. There were some solutions in the form of programs that you could download to do it for you, but they looked sketchy. I thought that I could write a program to do it, but I was lazy. I'm pretty sure there is a way to get Git to do it for you, but again I was too lazy to figure it out.
+
+So I just changed the Git configuration for LF line endings, deleted my repository, and re-cloned it.
+
+For reference this is how you can change your line endings:
+<blockquote>git config --global core.autocrlf [false||true]</blockquote>
+On a side note - there is also the ability to create a text attribute file that Git can use to figure out what line endings you want, among other things. You can refer to this link for more information: <a href="http://bit.ly/L7GBDs">http://bit.ly/L7GBDs</a>.
+
+After this was done I inputted the command to build FireFox and about thirty minutes later it was done (running on six cores of my 2.85 GHz PC). I found the executable that it had built, ran it, and the Nightly version of FireFox I had built popped up before my eyes.
+
+<a href="http://epsilon812.files.wordpress.com/2012/09/nightly-firefox-build.png"><img class="alignnone  wp-image-54" title="Nightly FireFox build" src="http://epsilon812.files.wordpress.com/2012/09/nightly-firefox-build.png?w=300" alt="Nightly FireFox build" width="529" height="296" /></a>
+
+So there you have it. My journey to building FireFox. I'll be back again to blog about dual booting my PC with Ubuntu when I get around to it as well as the many blog posts I will be making in relation to the WebVVT project with my Open Source Software class.
+
+See ya!

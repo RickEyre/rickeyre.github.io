@@ -1,0 +1,44 @@
+---
+layout: post
+title: Thoughts on Implementing WebVTT on FireFox
+tags:
+- Open Source
+- Seneca College
+- software
+- software-development
+- technology
+- w3c specification
+- WEBVTT
+status: publish
+type: post
+published: true
+meta:
+  _wpas_done_facebook: '1'
+  _wpas_done_twitter: '1'
+  _wpas_skip_linkedin: '1'
+  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2012-09-18
+    01:31:50";}
+---
+So, I'm back today with information on the project that my class and I will be completing this semester in Seneca's Open Source Software class. The project that we will be doing this semester is implementing the W3C Specification for WebVTT files in FireFox. If you've never heard of WebVTT before it is a way to display subtitles, cues, headings, and general text mark ups, on videos in HTML5.
+
+My first task along this road was to <a title="build FireFox" href="http://epsilon812.wordpress.com/2012/09/12/to-build-a-firefox/">build FireFox</a>. That went pretty smoothly other than having troubles with Ubuntu and Wubui. My next order of business was to look over the <a href="http://dev.w3.org/html5/webvtt/#webvtt-cue-text-rendering-rules">WebVTT Standard</a> as specified by W3C , as well as looking at some content created by people in the know for WebVTT. Some of the more helpful content that I looked at was this <a href="http://www.youtube.com/watch?v=RoYvr-KXvLs">video</a>, and these two pages: <a href="http://bit.ly/M6aRTU">http://bit.ly/M6aRTU</a>,<a href="http://bit.ly/jnyh4s"> http://bit.ly/jnyh4s</a>.
+
+WebVTT works by parsing a WebVTT (.vtt) file that contains the markup for the text that you will be displaying and then rendering it on the browser in a way I don't yet fully understand. From what I am reading in the WebVTT specification, I believe that once the WebVTT file is parsed the content of the file should be translated into a DOM of HTML elements. After that the browser somehow renders that DOM onto the screen. However, I am still fuzzy on this.
+
+<strong>0.1 Release</strong>
+
+We are now getting ready to start working towards our 0.1 release of the WebVTT parser. The professor has told us that this release should include the test suite for the parser which will possibly include some fuzz tests. This means that we will first be writing extensive testing specifications for the parser and then implementing them. We will probably be dividing up the specification into segments and assigning multiple people in the class to it to write different tests for it. The multiple people on one segment insures that they can cover each other and be able to catch all the tests that we can from the segment. Then we will all come together and review each test in order to make sure the test is correct. I don't know yet how we will be logging the test cases. Maybe with GIT issues or maybe just on paper. We will have to see on Thursday when our next class is.
+
+For those of you who don't know what <a href="http://en.wikipedia.org/wiki/Fuzz_testing">Fuzz</a> testing is don't feel sad! I didn't either until this morning. Fuzz testing is a way of hardening your code against security exploits. It does this by creating all kinds of different garbage that could be given to your program in the real world and tests your program against it. It creates many different permutations of it's garbage until your code breaks. In this way you can test for potentially millions of test cases that you wouldn't ever be able to do by hand.
+
+<strong>What I Will Need</strong>
+
+The technologies involved in this are manifold. We have CSS, HTML, JavaScript, C/C++, GIT, UTF-8, FireFox's extremely enormous build system, possibly Ubuntu (if I ever get around to making it work), and the WebVTT file format.
+
+This will give me a chance to brush up on some of my strong skills such as C/C++, GIT, and HTML. It will also allow me to learn about topics that I have been wanting to learn about for a while such as - JavaScript, and Linux. However, I am not looking forward to FireFox's build system, UTF-8.. or CSS. I don't know why but for a long time I have put off learning more about CSS. I know some things about it - I know the language syntax, coding structure, and some basic CSS styling markup. However, I do not know much advanced CSS styling. I just never really liked it. Maybe, this will give me a chance to push over the hill of not liking it and see the other side.
+
+There are many resources online that I can learn about these things. The W3C website for CSS and Mozilla's help pages for the build system. Although, I think my main help will be from my class mates and the open source community in general.
+
+So that's it for today! Hopefully I will be back soon with my stories of trying to get Ubuntu installed on my system. I recently dual booted it with my PC but ran into problems with it freezing and crashing. Eventually I messed up my Windows 7 partition and had to reinstall... but more on that later!
+
+See yah!

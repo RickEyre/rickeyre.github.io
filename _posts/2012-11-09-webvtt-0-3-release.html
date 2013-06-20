@@ -1,0 +1,327 @@
+---
+layout: post
+title: WebVTT 0.3 Release
+tags:
+- c parser
+- firefox
+- javascript test
+- Open Source
+- Seneca College
+- seneca college
+- software
+- software-development
+- technology
+- w3c specification
+- webvtt
+- WEBVTT
+status: publish
+type: post
+published: true
+meta:
+  _wpas_done_1604135: '1'
+  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2012-11-09
+    23:01:48";}
+  _wpas_done_1575533: '1'
+  _publicize_done_external: a:1:{s:8:"facebook";a:1:{i:503100574;b:1;}}
+  publicize_twitter_user: epsilon812
+  _wpas_done_1604132: '1'
+  publicize_reach: a:3:{s:7:"twitter";a:1:{i:1604132;i:5;}s:2:"fb";a:1:{i:1575533;i:216;}s:2:"wp";a:1:{i:0;i:7;}}
+---
+So it's been a while since I posted and in that intervening time we have been hard at work on the 0.3 release of our parser.
+
+For this release we are concentrating on mainly getting a full *working parser* out as well as getting our build system up to par with a unit testing strategy as well as making the parser be able to work across all platforms i.e. OS X, Linux, and Windows.
+
+For our Unit testing we are going with a Node-ffi solution. Node-ffi will allow us to dynamically bind our C library into a Javascript Test Suite within which we can easily do unit tests. If you want to read up more about that you can check out my classmate <a href="http://dale.io/2012/11/04/webvtt-03-node-ffi.html">Dales </a>blog who has volunteered to work on that.
+
+For our build system we are using <a href="http://en.wikipedia.org/wiki/GNU_build_system">Autotools</a> which is a build system from GNU that is designed to assist in making cross platform build systems. You can check out my classmate <a href="http://caitpotter.blogspot.ca/2012/11/autotools-are-difficult.html">Caitlins </a>blog to read more about that.
+
+I myself have been working more on the C parser. We chose to go with Caitlins version of the parser to go forward with when my class met to discuss our 0.2 release. This is related to the 'build two and plan to throw one away' idea that I talked about in my previous blog posts.
+
+I've been implementing the cue text parser portion of the C parser. This is the part that parses the payload of a WebVTT text track i.e. the actual text and markup that will be rendered on screen. Going down this road has also led me to work on a couple other parts of the C parser such as:
+<ul>
+	<li>Creating some utility functions to check whether or not a UTF16 character is a digit or an alphanumeric character respectively</li>
+	<li>Harnessing our other string code which Caitlin originally worked on to be able to append UTF16 strings together</li>
+	<li>Normalizing some of the function names in our C parser which Caitlin worked on. These have to do with changing function names from webvtt_x_delete or create to webvtt_delete_x. Not that hard.</li>
+	<li>We also discussed what character encoding to use internally in our parser. We decided on UTF16 as that gives some benefits such as it being the encoding that is used on the web as well as it being a simple encoding to use unlike UTF8. I will probably be working on getting the parser to use UTF16 strings after I finished the cue text parser.</li>
+</ul>
+I'll briefly go over the code I have done so far.
+
+<strong>Cue Text Parser</strong>
+
+For the cue text parser I followed the algorithm provided by the <a href="http://dev.w3.org/html5/webvtt/#webvtt-cue-text-parsing-rules">W3C specification</a> very closely. Here is the main parsing method:
+
+[sourcecode language="cpp"]
+/**
+ * Currently line and len are not being kept track of.
+ * Don't think pnode_length is needed as nodes track there list count internally.
+ */
+webvtt_status
+webvtt_parse_cuetext( webvtt_parser self, webvtt_uint line, const webvtt_wchar *cue_text,
+	const webvtt_uint len, webvtt_node *pnode, webvtt_uint *pnode_length )
+{
+	webvtt_wchar_ptr position_ptr = (webvtt_wchar_ptr)cue_text;
+	webvtt_node_ptr current = pnode, temp_node;
+	webvtt_cue_text_token_ptr token_ptr;
+	webvtt_node_kind kind;
+
+	if( !cue_text )
+	{
+		return WEBVTT_INVALID_PARAM;
+	}
+
+	/**
+	 * Routine taken from the W3C specification - http://dev.w3.org/html5/webvtt/#webvtt-cue-text-parsing-rules
+	 */
+	do {
+
+		webvtt_delete_cue_text_token( token_ptr );
+
+		/* Step 7. */
+		switch( webvtt_cue_text_tokenizer( position_ptr, token_ptr ) )
+		{
+		case( WEBVTT_UNFINISHED ):
+			/* Error here. */
+			break;
+		/* Step 8. */
+		case( WEBVTT_SUCCESS ):
+
+			/**
+			 * If we've found an end token which has a valid end token tag name and a tag name
+			 * that is equal to the current node then set current to the parent of current.
+			 */
+			if( token_ptr-&gt;token_type == END_TOKEN )
+			{
+				if( webvtt_get_valid_token_tag_name( ((webvtt_cue_text_end_tag_token *) token_ptr-&gt;concrete_token)-&gt;tag_name, &amp;kind ) == WEBVTT_NOT_SUPPORTED)
+					continue;
+
+				if( current-&gt;kind == kind )
+					current = current-&gt;parent;
+			}
+			else
+			{
+				/**
+				 * Attempt to create a valid node from the token.
+				 * If successful then attach the node to the current nodes list and also set current to the newly created node
+				 * if it is an internal node type.
+				 */
+				if( webvtt_create_node_from_token( token_ptr, temp_node, current ) != WEBVTT_SUCCESS )
+					/* Do something here. */
+					continue;
+				else
+				{
+					webvtt_attach_internal_node( (webvtt_internal_node_ptr)current-&gt;concrete_node, temp_node );
+
+					if( WEBVTT_IS_VALID_INTERNAL_NODE( temp_node-&gt;kind ) )
+						current = temp_node;
+				}
+			}
+			break;
+		}
+
+	} while( *position_ptr != UTF16_NULL_BYTE );
+
+	return WEBVTT_SUCCESS;
+}
+[/sourcecode]
+
+In short - it loops, calling the tokenizer function until it has reached the end of the buffer. Based on the status returned by the tokenizer it will either emit an error (not added yet) or it will add a node to the node list depending on what kind of token is returned.
+
+You can see in the code that I have created many utility functions that do things such as creating a node from a token and creating or deleting nodes or tokens. I won't list those functions here because it would be too much.
+
+The other main bulk of this parser is the actual tokenizer:
+
+[sourcecode language="cpp"]
+webvtt_status
+webvtt_cue_text_tokenizer( webvtt_wchar_ptr position_ptr, webvtt_cue_text_token_ptr token_ptr )
+{
+	webvtt_cue_text_token_state token_state = DATA;
+	webvtt_string result, annotation;
+	webvtt_string_list css_classes;
+	webvtt_timestamp time_stamp;
+	webvtt_status status = WEBVTT_UNFINISHED;
+
+	if( !position_ptr )
+	{
+		return WEBVTT_INVALID_PARAM;
+	}
+
+	/**
+	 * Loop while the tokenizer is not finished.
+	 * Based on the state of the tokenizer enter a function to handle that particular tokenizer state.
+	 * Those functions will loop until they either change the state of the tokenizer or reach a valid token end point.
+	 */
+	while( status == WEBVTT_UNFINISHED )
+	{
+		switch( token_state )
+		{
+		case DATA :
+			status = webvtt_cue_text_tokenizer_data_state( position_ptr, &amp;token_state, result );
+			break;
+		case ESCAPE:
+			status = webvtt_cue_text_tokenizer_escape_state( position_ptr, &amp;token_state, result );
+			break;
+		case TAG:
+			status = webvtt_cue_text_tokenizer_tag_state( position_ptr, &amp;token_state, result );
+			break;
+		case START_TAG:
+			status = webvtt_cue_text_tokenizer_start_tag_state( position_ptr, &amp;token_state, result );
+			break;
+		case START_TAG_CLASS:
+			status = webvtt_cue_text_tokenizer_start_tag_class_state( position_ptr, &amp;token_state, css_classes );
+			break;
+		case START_TAG_ANNOTATION:
+			status = webvtt_cue_text_tokenizer_start_tag_annotation_state( position_ptr, &amp;token_state, annotation );
+			break;
+		case END_TAG:
+			status = webvtt_cue_text_tokenizer_end_tag_state( position_ptr, &amp;token_state, result );
+			break;
+		case TIME_STAMP_TAG:
+			status = webvtt_cue_text_tokenizer_time_stamp_tag_state( position_ptr, &amp;token_state, result );
+			break;
+		}
+
+		if( *position_ptr != UTF16_GREATER_THAN &amp;&amp; *position_ptr != UTF16_NULL_BYTE )
+			position_ptr++;
+	}
+
+	/**
+	 * Code here to handle if the tokenizer status returned is not WEBVTT_SUCCESS.
+	 * Most likely means it was not able to allocate memory.
+	 */
+
+	/**
+	 * The state that the tokenizer left off on will tell us what kind of token needs to be made.
+	 */
+	if( token_state == DATA || token_state == ESCAPE )
+	{
+		 return webvtt_create_cue_text_text_token( token_ptr, result );
+	}
+	else if(token_state == TAG || token_state == START_TAG || token_state == START_TAG_CLASS ||
+			token_state == START_TAG_ANNOTATION)
+	{
+		return webvtt_create_cue_text_start_tag_token( token_ptr, result, css_classes, annotation );
+	}
+	else if( token_state == END_TAG )
+	{
+		return webvtt_create_cue_text_end_tag_token( token_ptr, result );
+	}
+	else if( token_state == TIME_STAMP_TAG )
+	{
+		/* Parse time stamp from result. */
+		return webvtt_create_cue_text_time_stamp_token( token_ptr, time_stamp );
+	}
+	else
+	{
+		return WEBVTT_NOT_SUPPORTED;
+	}
+
+	return WEBVTT_SUCCESS;
+}
+[/sourcecode]
+
+This function takes the byte stream and interprets it into tokens that the parser will be able to understand. One of the main departures that I made away from the W3C specification is that I've farmed each tokenizer state out to a function and therefore I had to change a tiny bit of the logic i.e. instead of using only a result and a buffer to parse the text I have created separate webvtt_strings that can handle each one of the result, buffer, and annotation. This simplifies the code as you don't have to pass back and forth only two parameters between everyone of these functions to keep track of the parsed output. I also created a webvtt_string_list struct that will be able to handle a list of strings for the classes of a start tag in the cue text.
+
+Here is an example of one of the functions that parses a tokenizer state:
+
+[sourcecode language="cpp"]
+webvtt_status
+webvtt_cue_text_tokenizer_start_tag_class_state( webvtt_wchar_ptr position_ptr,
+	webvtt_cue_text_token_state_ptr token_state_ptr, webvtt_string_list css_classes )
+{
+	webvtt_string buffer;
+
+	CHECK_MEMORY_OP( webvtt_create_string( 1, &amp;buffer ) );
+
+	for( ; *token_state_ptr == START_TAG_CLASS; position_ptr++ )
+	{
+		if( *position_ptr == UTF16_TAB || *position_ptr == UTF16_FORM_FEED ||
+			*position_ptr == UTF16_SPACE || *position_ptr == UTF16_LINE_FEED ||
+			*position_ptr == UTF16_CARRIAGE_RETURN)
+		{
+			CHECK_MEMORY_OP( webvtt_add_to_string_list( css_classes, buffer ) );
+			webvtt_delete_string( buffer );
+			*token_state_ptr = START_TAG_ANNOTATION;
+		}
+		else if( *position_ptr == UTF16_GREATER_THAN || *position_ptr == UTF16_NULL_BYTE )
+		{
+			CHECK_MEMORY_OP( webvtt_add_to_string_list( css_classes, buffer ) );
+			webvtt_delete_string( buffer );
+			return WEBVTT_SUCCESS;
+		}
+		else if( *position_ptr == UTF16_FULL_STOP )
+		{
+			CHECK_MEMORY_OP( webvtt_add_to_string_list( css_classes, buffer ) );
+			webvtt_delete_string( buffer );
+			CHECK_MEMORY_OP( webvtt_create_string( 1, &amp;buffer ) );
+		}
+		else
+		{
+			CHECK_MEMORY_OP( webvtt_string_append_wchar( buffer, position_ptr, 1 ) );;
+		}
+	}
+
+	webvtt_delete_string( buffer );
+	return WEBVTT_UNFINISHED;
+}
+[/sourcecode]
+
+Each one of the tokenizer state functions loops until either it changes the state of the tokenizer, which means it needs to start parsing it in another one of the tokenizer state functions, or it reaches a 'termination' point i.e. a point where either a valid token has been parsed or where it has come across the end of the byte stream prematurely.
+
+CHECK_MEMORY_OP is just a macro that takes the returned webvtt_status and compares it to see if it was a success. If it was not then it returns the status that the memory operation returned. One problem that I have here is that since it returns immediately there is no place to deallocate memory that may have been allocated in the function. Should be easy to fix but I haven't gotten around to it yet.
+
+<strong>UTF16 String Manipulations</strong>
+
+I haven't completed some of the functions that I call in the parser code for UTF16 strings such as the functions that handle appending webvtt_wchars or webvtt_strings to webvtt_strings, but I will be working on that next. I also need to implement a function that will hopefully take a string literal and append it to a webvtt_string.
+
+The functions for webvtt_strings that I have working so far are the is_digit, is_alphanumeric, and add to webvtt_string_list functions,:
+
+[sourcecode language="cpp"]
+webvtt_status
+webvtt_add_to_string_list( webvtt_string_list string_list, webvtt_string string )
+{
+	if( !string )
+	{
+		return WEBVTT_INVALID_PARAM;
+	}
+
+	if( !string_list.items )
+	{
+		string_list.list_count = 0;
+		string_list.items = (webvtt_string *)malloc( sizeof( webvtt_string ) );
+	}
+	else
+	{
+		string_list.items = (webvtt_string *)realloc( string_list.items,
+			sizeof( webvtt_string ) * ( string_list.list_count + 1 ) );
+	}
+
+	if( string_list.items )
+	{
+		string_list.items[string_list.list_count] = string;
+		string_list.list_count++;
+	}
+	else
+		return WEBVTT_OUT_OF_MEMORY;
+
+	return WEBVTT_SUCCESS;
+}
+
+webvtt_uint
+webvtt_is_alphanumeric( webvtt_wchar character )
+{
+	return ( character &gt;= UTF16_DIGIT_ZERO &amp;&amp; character &lt;= UTF16_DIGIT_NINE ) ||
+			  ( character &gt;= UTF16_CAPITAL_A &amp;&amp; character &lt;= UTF16_CAPITAL_Z ) ||
+			  ( character &gt;= UTF16_A &amp;&amp; character &lt;= UTF16_Z );
+
+}
+
+webvtt_uint
+webvtt_is_digit( webvtt_wchar character )
+{
+	return character &gt;= UTF16_DIGIT_ZERO &amp;&amp; character &lt;= UTF16_DIGIT_NINE;
+}
+[/sourcecode]
+
+One final thing that I want to mention is that all this code is completely untested so far. Once I get the webvtt_string functions in place I will start to debug and test it. If you want to check out the entire code that I've been working on you can see that <a href="https://github.com/RickEyre/webvtt/tree/cue-text-parser">here</a>. The main places you can look in are <a href="https://github.com/RickEyre/webvtt/blob/cue-text-parser/src/libwebvtt/cuetext.c">cuetext</a>, <a href="https://github.com/RickEyre/webvtt/blob/cue-text-parser/src/libwebvtt/cue.c">cue</a>, and <a href="https://github.com/RickEyre/webvtt/blob/cue-text-parser/src/libwebvtt/string.c">string</a>. Our 0.3 release is due this Thursday coming up. I'm aiming to have this cue text parser done along with the change over to use of UTF16 everywhere in the parser, as well as converting my old tests from the 0.1 release to Unit Tests using the new Node-ffi Javascript test suite.
+
+Later!

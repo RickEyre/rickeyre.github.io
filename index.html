@@ -1,4 +1,11 @@
 ---
 layout: default
 ---
-<img class="coming-soon" src="../assets/img/content-pics/coming-soon-robot-inverse.png" alt="Wow coding" width="75%" height="75%" />
+{% for post in paginator.posts %}
+  <span class="tag-line">{{ post.date | date_to_string }}</span>
+  <h1><a href="{{ post.url }}">{{ post.title }}</a></h1>
+  <div>
+    {{ post.content }}
+    <hr/>
+  </div>
+{% endfor %}

@@ -1,0 +1,55 @@
+---
+layout: post
+title: 'CSS Parsing: Writing-mode'
+tags:
+- CDOT
+- cdot
+- css
+- CSS
+- css parsing
+- css properties
+- css property values
+- dom nodes
+- gecko
+- gecko layout
+- Layout
+- layout
+- mozilla
+- Mozilla
+- Open Source
+- seneca
+- Seneca College
+- seneca college
+- software
+- software-development
+- technology
+- text-orientation
+- vertical-text
+- w3c
+- webvtt
+- WEBVTT
+- whatwg
+- writing-mode
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  _wpas_done_1604135: '1'
+  publicize_twitter_user: epsilon812
+  _wpas_done_1604132: '1'
+  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:384903786;b:1;}}
+  publicize_reach: a:2:{s:7:"twitter";a:1:{i:1604132;i:41;}s:2:"wp";a:1:{i:0;i:10;}}
+  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2013-06-08
+    03:08:09";}
+---
+One of the things I've been working on since I got back from Taipei has been helping with the implementation of vertical-text in Gecko which WEBVTT needs to support. The small way in which I helped out was to implement the <a href="http://dev.w3.org/csswg/css-writing-modes/#writing-mode">"writing-mode"</a> property in the style system. Basically this is just getting the Gecko CSS parser/scanner to understand the new property and be able to process it correctly. This was fairly easy to implement due to <a href="http://blog.dholbert.org/search/label/mozilla">Daniel Holbert</a> (:dholbert) giving me an awesome walkthrough of the things that would need to change in order for this to work and also an example <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=702508">bug</a> where he did a similar thing. So after half a day doing the initial code and a few rounds of review it <a href="https://hg.mozilla.org/mozilla-central/rev/3e2d3f3235b4">landed</a> in the tree and we're now one step closer to vertical text!
+
+If you'd like to learn more about how the style system works you can head over to the style section of the <a href="https://wiki.mozilla.org/Gecko:Overview?title=Gecko:Overview#Style_System">Gecko overview</a> page which also has a lot of really good information on how Gecko works in general. I won't duplicate information here, but I will talk about a couple of the things I found interesting in the style system.
+<ul>
+	<li>CSS property values are stored in a computed form and there are translation mechanisms to go back and forth between the two.</li>
+	<li>The computed values of CSS properties live in structs, namely <a href="http://mxr.mozilla.org/mozilla-central/source/layout/style/nsStyleStruct.h">nsStyleStructs</a>, and CSS properties that tend to be set together live in the same struct. For example -- when a user sets the font-family property they are likely to also set the font-size, font-weight, etc, so storing the computed values of these properties together makes sense.</li>
+	<li>Single instances of nsStyleStructs, i.e. one set of related properties, are shared across many different DOM nodes as DOM nodes are more likely to share one set of CSS properties then they are to have different sets of properties. For example, the vast majority of times that a page sets font properties the entire page will share these properties. This cuts down on memory usage. These structs are immutable and when the same CSS property needs to be set differently on another set of DOM nodes a new struct will be created for the new set of properties.</li>
+	<li>Each nsStyleStruct has a CalcDifference() function that gives hints to Gecko about when it needs to update the rendering of the page based on the CSS properties changing, i.e. if it needs to reconstruct the frame or the text needs to be reflowed, etc.</li>
+</ul>
+In the future I'm hoping to help with more layout things. Hopefully, I can do the same kind of <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=875250">bug</a> for the <a href="http://dev.w3.org/csswg/css-writing-modes/#text-orientation">"text-orientation"</a> CSS property, which is also needed for vertical text. I haven't started as of yet as it's still kind of up in the air in the spec. Right now I've also started work on another easy <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=785821">bug</a> to reorganize the reftests in layout/reftest/form. Hopefully, I can get that done sometime next week. We'll need reftests for WEBVTT as well so this will be a good bug where I can learn about them.

@@ -1,0 +1,105 @@
+---
+layout: post
+title: WebVTT Cue Text Parser
+tags:
+- algorithms
+- Open Source
+- seneca
+- Seneca College
+- software
+- software-development
+- webvtt
+- WEBVTT
+status: publish
+type: post
+published: true
+meta:
+  _wpas_done_1604135: '1'
+  publicize_reach: a:3:{s:7:"twitter";a:1:{i:1604132;i:5;}s:2:"fb";a:1:{i:1575533;i:215;}s:2:"wp";a:1:{i:0;i:7;}}
+  _wpas_done_1575533: '1'
+  _publicize_done_external: a:1:{s:8:"facebook";a:1:{i:503100574;b:1;}}
+  publicize_twitter_user: epsilon812
+  _wpas_done_1604132: '1'
+  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2012-10-29
+    17:12:12";}
+  _wpas_skip_1575533: '1'
+  _wpas_skip_1604132: '1'
+  _wpas_skip_1604135: '1'
+---
+<strong>UPDATE Nov 5:</strong>
+
+I'm working on a cue text algorithm that follows the W3C specification. Didn't know why I wasn't doing this before as I followed the specification for all other parts of the parser.
+
+I'll write a new blog post on it when we get it done.
+
+<strong>UPDATE Oct 29:</strong>
+
+I realized this morning that this won't work for cases such as '&lt;i&gt; text &lt;/i&gt; more &lt;b&gt; text &lt;/b&gt;'.
+
+I thought of a better algorithm and will post later.
+
+<strong>-----------------------------------------------------------------</strong>
+
+My partner and I have been agonizing over creating an algorithm that will parse cue text. We've debated how to do it recursively, iteratively, etc. I think we've come up with a fairly good algorithm tonight.
+
+We've only done it in pseudocode so far. Hopefully, we will be able to turn this into real code sometime soon. Feel free to mention any errors or inconsistencies you find in it.
+
+It leaves out a couple edge cases such as 'ruby' and 'rt' text tags, time stamp text tags, as well as ignore parser logging. It also makes use of convenient collection methods such as add() and other things. Turning this into C code would involve a lot of leg work.
+
+Anyways, here it is:
+
+[sourcecode language="cpp"]
+int find_end_tag(text, min_index ,*max_index, expected, *leaf_node) {
+
+	for (i = max_index; text[i] != '&gt;' &amp;&amp; i &gt; min_index; i++);
+
+	if (i == 0 || text[--i] != expected || text[--i] != '/' || text[--i] != '&lt;')
+		return 0;
+
+	if (i &lt; max_index - 3) {
+		leaf_node = new leaf_node();
+		leaf_node.type = text;
+		leaf_node.text = substring(text, i, max_index);
+		max_index = i;
+	}
+
+	return 1;
+}
+
+int parse_cue_text(text, node, min, max) {
+
+	lead_node_start, leaf_node_end;
+	char expected = '';
+
+	for (i = min; i &lt; max; i++) {
+		if (text[i] == '&lt;') { 			switch (text[++i]) { 				case 'i': 					expected = 'i'; 				case 'u': 					expected = 'u'; 				case else: 					return 0; 			} 			 			if (text[++i] != '&gt;')
+				return 0;
+
+			//If it cannot find end tag
+			if (!find_end_tag(text, i, &amp;max, expected, &amp;leaf_node_end))
+				return 0;
+			//If there is text between the start of min and where the found tag starts then  create a leaf node of text
+			if (min &lt; i)
+				leaf_node_start = new leaf_node(text_type_enum, text.substring(min, i));
+
+			node.node_list.add(leaf_node_start);
+
+			//Create a new internal node with the type of expected
+			node.node_list.add(new internal_node(expected));
+
+			//Parse the next part of the cue text
+			if (!parse_cue_text(text, node.node_list[node.node_list.length()], &amp;min, &amp;max))
+				return 0;
+
+			node.node_list.add(leaf_node_end);
+		}
+	}
+	if (min &lt; max)  		node.node_list.add(new leaf_node(text_type_enum, text.substring(min, max))); 	return 1; } int parse_text(cue) { 	 	//Failed cue text 	if (!parse_cue_text(cue_text_line, cue-&gt;head, 0, cue_text_line.length())
+		return 0;
+	//Captured no cue text
+	if (cue.head.node_list.length())
+		return 0;
+
+	return 1;
+}
+[/sourcecode]

@@ -1,0 +1,103 @@
+---
+layout: post
+title: 'WebVTT: Refactoring the Parser'
+tags:
+- Open Source
+- seneca
+- Seneca College
+- seneca college
+- software
+- software-development
+- technology
+- w3c specification
+- WEBVTT
+status: publish
+type: post
+published: true
+meta:
+  _wpas_done_1575533: '1'
+  publicize_twitter_user: epsilon812
+  _publicize_done_external: a:1:{s:8:"facebook";a:1:{i:503100574;b:1;}}
+  _wpas_done_1604132: '1'
+  _wpas_done_1604135: '1'
+  publicize_reach: a:3:{s:7:"twitter";a:1:{i:1604132;i:12;}s:2:"fb";a:1:{i:1575533;i:215;}s:2:"wp";a:1:{i:0;i:8;}}
+  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2012-12-06
+    02:43:39";}
+  _wpas_skip_1575533: '1'
+  _wpas_skip_1604132: '1'
+  _wpas_skip_1604135: '1'
+---
+So far I've gotten only a little bit done on the way to getting the cue text parsing portion of the parser finished. I have a pretty clear idea where I want to go though.
+
+<strong>Nodes</strong>
+
+I've squashed the Node structs into one node and renamed it a cuetext_tag.
+<ul>
+	<li>The renaming should clear up some misunderstandings/make the purpose of the struct more clear.</li>
+	<li>Squashing the structs into one makes the number of functions we need to maintain decrease, allows for easier code reading and maintenance</li>
+	<li>Since all the data is now in one struct and is not referenced by a void * we can easily see the data in real time when debugging. When it's a void * you can't see what the data is inside when debugging in real time.</li>
+</ul>
+[sourcecode language="cpp"]
+struct
+webvtt_cuetext_tag_t
+{
+	/**
+	 * The specification asks for uni directional linked list, but we have added a parent
+	 * in order to facilitate an iterative cue text parsing solution.
+	 */
+	webvtt_cuetext_tag *parent;
+	webvtt_cuetext_tag_kind kind;
+
+	/**
+	 * This union will hold either an internal cue text tag data struct represeting the internal data of an internal cue text tag
+	 * data type, a bytearray representing the text of a text cue text type, or a time stamp representing the time stamp of
+	 * a time stamp cue text tag.
+	 */
+	union
+	{
+		webvtt_internal_cuetext_tag_data *internal_cuetext_tag_data;
+		webvtt_bytearray text;
+		webvtt_timestamp time_stamp;
+	};
+
+};
+
+struct
+webvtt_internal_cuetext_tag_data_t
+{
+	webvtt_string annotation;
+	webvtt_bytearray_list *css_class_list;
+
+	webvtt_uint alloc;
+	webvtt_uint length;
+	webvtt_cuetext_tag *children;
+};
+[/sourcecode]
+
+In accordance with this I've renamed everything having to do with Nodes to cuetext_tag.
+
+<strong>Character Encoding</strong>
+
+We've decided to switch over to UTF8 instead of UTF16 as this will decrease the complexity of the parser.
+<ul>
+	<li><span style="line-height:16px;">Input into the parser is already either supposed to by UTF8 or converted to UTF8 so an extra step of converting it to UTF16 is extra overhead</span></li>
+	<li>All the characters that need to be worked with to parse the WEBVTT file are the same values in UTF8 as in ASCII so we don't have to write custom functions to work with strings</li>
+	<li>If we really want the output of the parser to be something else other then UTF8 then we can convert it before we output/make available the parsed WEBVTT file.</li>
+</ul>
+Another thing we'll need to do is make a string list for the webvtt_bytearray (what we are using to handle UTF8) just like we did for the UTF16 stuff so that the cue text parser can store a list of CSS classes that have been applied to a cue text tag.
+
+<strong>Other Parser Things</strong>
+
+The other thing that I will be doing for sure are getting rid of the token structs in the cue text parser. Right now the cue text parser calls a tokenizer which creates a token that has basically the same data and structure as a node (cuetext_tag now). This token then gets mapped over to a particular cuetext_tag. This is how the WEBVTT algorithm wanted it, but I don't really see the point if we are just going to translate it. So I'm going to take the tokens out and instead instantiate cuetext_tags straight away instead of going through a token struct first.
+
+<strong>C++ Bindings</strong>
+
+So we've been having a lot of memory leak problems with the Node C++ bindings (soon to be cuetext_tag bindings). I've thought about it and what I would suggest doing is to loop through the entire tree of cuetext_tags upon the instantiation of the cue which owns them and create a cue text tag for each one of them.
+
+Then when we call child() in the Unit Tests we won't be allocating any new memory, we'd just be retrieving the already created C++ cuetext_tag.
+
+Then since cue knows about it's tree of cuetext_tags it can start a cascading delete on the entire tree of cuetext_tags when it's destructor is called.
+
+Voila, no more memory leaks.
+
+I'm going to be rewriting those bindings after I finish the changes to the parser, hopefully it won't take too long.

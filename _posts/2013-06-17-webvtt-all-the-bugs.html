@@ -1,0 +1,57 @@
+---
+layout: post
+title: 'WEBVTT: All the Bugs.'
+tags:
+- CDOT
+- cdot
+- mozilla
+- Mozilla
+- nightly
+- Open Source
+- Seneca College
+- seneca college
+- software
+- specification
+- technology
+- text track
+- track
+- w3c
+- webvtt
+- WEBVTT
+- whatwg
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  _wpas_done_1604135: '1'
+  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2013-06-17
+    20:22:18";}
+  publicize_twitter_user: epsilon812
+  _wpas_done_1604132: '1'
+  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:384903786;b:1;}}
+  publicize_reach: a:2:{s:7:"twitter";a:1:{i:1604132;i:40;}s:2:"wp";a:1:{i:0;i:10;}}
+---
+So I'm happy to finally say that Nightly now has initial support for WebVTT! Woot!! To check it out follow these steps:
+<ol>
+	<li><a href="http://nightly.mozilla.org/">Download Nightly</a>.</li>
+	<li>Turn the WebVTT pref on by typing 'about:config' into your URL bar, search for webvtt, and double clicking on the result to flip it to true.</li>
+	<li>Browse to a webpage with WebVTT like <a href="http://people.mozilla.org/~rgiles/2013/demo.html">this page</a>.</li>
+</ol>
+Do all these things and you should see subtitles! It's been about six months of work on and off now in school and afterwards to get this initial support working on Firefox so it's pretty amazing to see it working.
+<h2>What's Left to Do -- Everything</h2>
+The thing that we have next on our plate is to fix up our current implementation so that we meet the spec requirements. We have a lot left to do to bridge that gap... In regards to this I spent Thursday last week going through the spec, figuring out the outline of what we <em>may</em> need to do to get our implementation up to date, and logged bugs about it. I logged a ton of them and there are still more hiding in the spec, so there really is a lot of work left to do. Hopefully, this will give us more clarity around what needs/may need to happen in implementing the spec. If it turns out we don't need/want to implement something internally that the spec recommends we should then these bugs will at least serve as a place to discuss and document those decisions.
+
+Just last Friday we had one of these particular incidents. The spec recommends that we use an 'active flag' to keep track of which cues are currently active, or showing, on the screen. The problem with this is that it would require us to iterate through the entire cue list and check which cues have the active flag set every time we want to update the rendering of the captions. This isn't very efficient and it's an internal detail to the spec i.e. it would never be exposed to the user so we have some leeway to implement this in ways that make sense for Gecko. What we decided on is that we will keep the main cue list of a text track sorted which will make it very easy for us to keep track of the active cues based on the current play back time. I've done some work for that <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=883173">here</a>.
+<h2>Testing</h2>
+Unfortunately, the main <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=833386">bug for tests</a> along with Caitlin's new <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=882131">tests</a> for making sure that we don't display cues that have malformed time stamps still haven't landed. We've had problem after problem with these. The newest of them being that they don't pass on android for some reason. I suspect the track data isn't being loaded properly so we keep waiting in the test for this to happen and it eventually times out.
+
+The two problems we had before that have finally been solved.The first of them was that we were using the 'loadedmetadata' event to determine when the cues were loaded for a VideoElement. The problem with this was that we don't implement the necessary steps to inform the VideoElement when the cues are ready, so 'loadedmetadata' is dispatched before they are actually ready. To solve this Catilin <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=882535">implemented</a> the HTMLTrackElement::ReadyState, which is in the spec, but wasn't in our implementation, and we can hook into that to determine when they are ready. The second problem was that the Query Interface implementation for HTMLTrackElement had a bug in it where we weren't able to cast it to an nsIDOMHTMLElement. This was fine on opt builds, but for debug builds we were getting assertions that the HTMLTrackElement wasn't a DOMNode or DOMWindow when we tried to check it's content policy. I landed a <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=882817">patch</a> that solved that just last Friday.
+
+Hopefully, we can have these tests landed by this week... we shall see though. It depends on how quickly this Android debugging goes for me..
+<h2>Time Flies</h2>
+The rest of my time these last few weeks has been taken up with relatively small things that build up on each other, like commenting on bugs, reading the spec (which can take forever as it's fairly complicated), helping out Marcus, giving feedback on patches, planning to figure out what is the best thing to do next, etc. Hopefully, we can get WebVTT in Firefox up to spec soon, we'll have to see though.
+<h2>Getting Involved</h2>
+If you are interested and wanting to get involved I would really encourage you to come out and become a contributor. There really is a <strong>ton</strong> of work left to do -- for the <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=webvtt">implementation of the track spec</a> as well as for libwebvtt (the C parser). You can get in touch with the current contributors via a number of ways -- Mozilla's <a href="https://lists.mozilla.org/listinfo/dev-media">dev media mailing list</a>, the #media IRC channel on irc.mozilla.org, or on the <a href="https://github.com/mozilla/webvtt">mozilla/webvtt GitHub page</a>. Check out the <a href="https://wiki.mozilla.org/WebVTT">WebVTT wiki</a> page for more information on how to get involved.
+
+Until next time.

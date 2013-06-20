@@ -1,0 +1,61 @@
+---
+layout: post
+title: Web Rendering Week -- Recap
+tags:
+- CDOT
+- cdot
+- css
+- firefox
+- gecko
+- gecko rendering
+- Layout
+- layout
+- mozilla
+- Mozilla
+- mozilla taiwan
+- popcorn maker
+- seneca
+- Seneca College
+- seneca college
+- software
+- taipei
+- technology
+- w3c
+- w3c specification
+- web rendering week
+- webmaker
+- WebMaker
+- webvtt
+- WEBVTT
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  _wpas_done_1604135: '1'
+  publicize_reach: a:2:{s:7:"twitter";a:1:{i:1604132;i:38;}s:2:"wp";a:1:{i:0;i:10;}}
+  publicize_twitter_user: epsilon812
+  _wpas_done_1604132: '1'
+  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:384903786;b:1;}}
+  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2013-05-29
+    16:39:07";}
+---
+So I'm back home now. The flight home was a bit shorter, about two hours, thankfully. Interestingly enough I feel more jet lagged now that I'm home then I was in Taiwan. I've heard that going east is worse then going west, so that might be the case for me right now. The rest of the rendering week, after I blogged last Tuesday, was just as awesome as the first part.
+<h2>How Gecko Does X</h2>
+I got to sit in on a lot more talks about "How Gecko does X" -- like how the graphics engine works, how the layout system works, and my favourite in particular, how cycle collection works. Kyle Huey did an excellent job explaining how the Gecko cycle collector works. He gave us <a href="http://media.junglecode.net/media/Bacon01Concurrent.pdf">this paper</a> as forward reading about it (it's a little dense, but definitely worth reading). I'll try to do a blog post in the future on what I learned/will learn about it.
+
+David Baron and Adam Roach also gave an awesome talk on how the W3C and IETF work. WEBVTT is my first major exposure to open specifications that I've had and so I've been interested in all the hows/whats/whys of open specifications and the politics behind them.
+<h2>Initial WEBVTT Support</h2>
+It wasn't all fun and games over in Taiwan though. We were also doing a lot of work. We finally got bug <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=833385">833385</a> <a href="https://hg.mozilla.org/mozilla-central/rev/65d9aab57df9">landed</a> near to the end of the week. This means that we have support for all the new DOM elements that WEBVTT introduces such as: <a href="http://mxr.mozilla.org/mozilla-central/source/content/html/content/src/HTMLTrackElement.h">HTMLTrackElement</a>, <a href="http://mxr.mozilla.org/mozilla-central/source/content/media/TextTrack.cpp">TextTrack</a>, <a href="http://mxr.mozilla.org/mozilla-central/source/content/media/TextTrackList.h">TextTrackList</a>, <a href="http://mxr.mozilla.org/mozilla-central/source/content/media/TextTrackCue.h">TextTrackCue</a>, and <a href="http://mxr.mozilla.org/mozilla-central/source/content/media/TextTrackCueList.h">TextTrackCueList</a>. We ran into a random inexplicable bug when we were doing full tries on the code, just before landing it. Ralph and I went to work debugging it (had to use an ASAN build) and we ended up discovering that it happened in a very rare situation where the cycle collector nulls out the HTMLMediaElement's TextTrackList member while the HTMLMediaElement is still alive. This results in a situation where HTMLMediaElement::FireTimeUpdate() is called just before it is about to be deleted and since we weren't doing null checks on the call to TextTrackList::Update() we would crash. After we got that fixed we were all green.
+
+That leaves just bug <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=833382">833382</a> left before we get initial support for WEBVTT. It was going well last week and we got an r+ from Chris Pearce. Now we just need an r+ from Boris and we should be good to go. It might take a few more rounds of review before that happens, but I'm optimistic we will be able to get this landed within a week or so.
+
+One of the major problems I was having in Taiwan was trying to get a clean diff for 833382. The problem centered around the fact that up until now, mainly in my previous open-source class, we decided to use a <a href="https://github.com/RickEyre/mozilla-central/tree/integration">git branch</a> as a main point of 'integration'. We've all been working off this branch for a while. The history of this branch has been so ridiculous and the code necessary for 833382 depends on so many other parts of the code that have been touched by, well everyone, that it was pretty much impossible for me to do a clean diff or even get a good rebase. To rebase this beast I would have had to go through 150+ commits, each having merge conflicts... So I ended up just making a clean branch off master and manually moving all the code that I needed over to the new branch and doing a diff like that. I'll probably be staying away from these kinds of 'integration' branches in the future in order to ensure that my repo history can be more linear. Easier to get diffs that way.
+
+The other thing I've been dealing with in the last few days is some <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=833388">code we landed</a> back in February that was spotted to not be up to par by Boris. The issue is with some of the CSS selectors that we are using to style WEBVTT text -- namely, we are using slow CSS selectors which is <em><strong>bad</strong></em>. This is the first that I've heard about some CSS selectors being slower than others, although that's not suprising as I'm not super-super knowledgeable about CSS. Mozilla even has a page devoted to this that you can check out <a href="https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Writing_efficient_CSS">here</a>. Ralph and I put together a <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=875305">patch</a> yesterday to deal with this which will land today most likely. I'll have to update 833382 to reflect those changes today as well.
+<h2>CSS Parser Hacking</h2>
+I also sat in on the vertical-text layout meeting as it is of particular interest to WEBVTT. WEBVTT requires the ability to have vertical-text and so far in Gecko we don't have this. Apparently vertical-text has been kind of a thorn in the side of the layout team for a long time as it's been particularly hard to implement. However, there is a major push now to get it done, so that's great. In accordance with this Daniel Holbert asked me if I wanted to do some stuff for vertical-text in the CSS parser, I accepted and got my first layout <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=772321">bug</a>! So I'll be hacking around in the CSS parser and layout section of Gecko more in the future, hopefully.
+<h2>WebMaker</h2>
+Dave also told me the other day that he's figured out an area of WebMaker that I can start contributing to, so I'm excited about that. I'll be starting in about two weeks on this. I'll most likely be splitting my time like 70/30 or something like that for WEBVTT and WebMaker. We talked briefly about it and so my understanding isn't 100%, but what I got from our talk is that I will be implementing a kind of wrapper around an HTML5 video element that will allow Popcorn Maker to be able to work with it. From my understanding Popcorn Maker works with many different video formats/sources and so it needs a uniform interface to work with all these different videos. That's where the wrapper comes in. It allows Popcorn Maker to work with many different video formats and sources without worrying about the particulars. However, all this might be completely wrong  as I might have misunderstood some things from our brief conversation... So don't take my word for it! At any rate I'll do another blog post about it when I get more information.
+
+Until next time.

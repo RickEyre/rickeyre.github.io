@@ -1,0 +1,171 @@
+---
+layout: post
+title: WebVTT 0.2 Release Update
+tags:
+- c
+- html line
+- line positions
+- Open Source
+- python
+- Seneca College
+- seneca college
+- software
+- software-development
+- technology
+- tree data structure
+- w3c specificati
+- webvtt
+- WEBVTT
+status: publish
+type: post
+published: true
+meta:
+  _wpas_done_1575533: '1'
+  _publicize_done_external: a:1:{s:8:"facebook";a:1:{i:503100574;b:1;}}
+  _wpas_done_1604135: '1'
+  publicize_reach: a:3:{s:7:"twitter";a:1:{i:1604132;i:5;}s:2:"fb";a:1:{i:1575533;i:215;}s:2:"wp";a:1:{i:0;i:4;}}
+  publicize_twitter_user: epsilon812
+  _wpas_done_1604132: '1'
+  _wpas_skip_1575533: '1'
+  _wpas_skip_1604132: '1'
+  _wpas_skip_1604135: '1'
+  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2012-10-18
+    13:50:00";}
+---
+I don't have that much time today so I will just go over the things that I have been up to since my last blog post.
+
+<strong>C Parser</strong>
+
+I've added a TextTrackCue struct that will keep information about a WebVTT text track cue:
+
+[sourcecode language="cpp"]
+/* Holds the information for a text track cue.
+ * This is one entry into the WebVTT file
+ * Referenced from http://dev.w3.org/html5/webvtt/#webvtt-parser-algorithm Steps 20 -29
+ */
+typedef struct
+{
+	// Pointer to the head of the text track cue text list
+	Node *head;
+
+	TimeStampNode timeStamp;
+	WritingDirection writingDirection;
+	Alignment cueAlignment;
+	LinePosition linePosition;
+	short pauseOnExit;
+	short snapToLines;
+	int textPosition;
+	int cueSize;
+
+} TextTrackCue;
+[/sourcecode]
+
+This struct holds all of the text track cue's information - it's HTML timings and settings as well as the text track cue text. The text track cue text is held in the "Node *head" pointer. This is a pointer to the head of the tree data structure that I described in my <a href="http://epsilon812.wordpress.com/2012/10/17/webvtt-0-2-release/">previous </a>blog post. To go over that quickly again - the text track cue text contains many different markups that can be nested within each other. The WebVTT specifications tells you to use a tree data structure to represent this. We implemented this by creating a hierarchy of structs using a void pointer to hold a reference to the derived class and an enum to identify which type of struct it is.
+
+For the text track cue struct we also created a couple different enumerations to identify the different types of HTML that can be applied to the text track:
+
+[sourcecode language="cpp"]
+// Enumerates possible HTML writing directions
+typedef enum
+{
+	Vertical,
+	Horizontal
+} WritingDirection;
+
+// Enumerates possible HTML alignments
+typedef enum
+{
+	Top,
+	Middle,
+	Bottom
+} Alignment;
+
+// Enumerates possible HTML line positions
+typedef enum
+{
+	Auto
+} LinePosition;
+[/sourcecode]
+
+We have not yet filled out all the particular enumeration options that will be available in the final implementation.
+
+The other things that I contributed was to finish the function that will check the WebVTT marker at the beginning of the .vtt file, filled out some skeleton code for functions and our processes that we will need to do in the future, and filled out a lot of comments.
+
+Here is our WebVTT mark checker:
+
+[sourcecode language="cpp"]
+// Checks for the correct starting format of the WebVTT file
+// Referenced from: http://dev.w3.org/html5/webvtt/#webvtt-parser-algorithm Steps 3 - 8
+void checkWebVttMarker(WebVttBufferInfo *webVtt)
+{
+	// Check for BOM character and skip it if found
+	if (webVtt-&gt;position[0] == FIRST_BOM_BYTE &amp;&amp; webVtt-&gt;position[1] == SECOND_BOM_BYTE &amp;&amp; webVtt-&gt;position[2] == THIRD_BOM_BYTE)
+		webVtt-&gt;position += 3;
+
+	// Read the first line of the WebVtt
+	loadLine(webVtt);
+
+	// WebVTT starting marker is malformed if:
+	//		- First line is less than 6 characters long
+	//		- First 6 chracters are not equal to WEBVTT
+	//		- Possible seventh character must either be SPACE or TAB
+	if (strlen(webVtt-&gt;currentLine) &lt; 6 || 		 	    
+	    memcmp(webVtt-&gt;currentLine, &quot;WEBVTT&quot;, 6) ||
+	    strlen(webVtt-&gt;currentLine) &gt; 6 &amp;&amp; webVtt-&gt;currentLine[7] != TAB &amp;&amp; webVtt-&gt;currentLine[7] != SPACE)
+	    webVtt-&gt;state = MalformedWebVttMarker;
+}
+[/sourcecode]
+
+My partner<a href="http://zaf1.wordpress.com/"> Shayan Zafar</a> also started work on an error/ignore logging system for the parser. We need to implement this in order to have a way to keep track of all the cue text that the parser ignores/errors on. This will allow us to hook our test suite into the parser.
+
+If you want to check out all the code we've completed up until now you can head over to our <a href="https://github.com/RickEyre/webvtt/tree/c-parser/webvtt-parser-new">GitHub</a>.
+
+<strong>Build System</strong>
+
+The work I did for the build system was to fix some of the bugs we were having with counting the test files that passed and didn't pass. The problem we were having is that we were accounting for only two types of tests when there are actually three.
+
+The three types of tests we have are:
+<ul>
+	<li>Tests that are expected to pass or fail and are known to do so</li>
+	<li>Tests that should pass but are known to fail</li>
+	<li>Tests that should fail but are known to pass</li>
+</ul>
+Having these three types of tests we need to keep track of nine totals i.e. the pass and fail count of each. We also need to do special reporting for those tests that should pass but are known to fail but pass and vice versa.
+
+The problem before was that we were lumping the last two types of tests together. For example - when a test that should pass but is known to fail passes; that pass would be added to the pass count of the opposite type.
+
+Here is the changed code:
+
+[sourcecode language="python"]
+&quot;&quot;&quot;Totals that relate to tests that should always pass or fail&quot;&quot;&quot;
+passed_total = 0
+failed_total = 0
+
+&quot;&quot;&quot;Totals that relate to tests that should pass but are known to fail&quot;&quot;&quot;
+known_good_passed_total = 0
+known_good_failed_total = 0
+
+&quot;&quot;&quot;Totals that relate to tests that should fail but pass&quot;&quot;&quot;
+known_bad_passed_total = 0
+known_bad_failed_total = 0
+
+for test_suite in [{'name': 'good', 'expected': 0},
+                   {'name': 'bad', 'expected': 1},
+                   {'name': 'known-good', 'expected': 1},
+                   {'name': 'known-bad', 'expected': 0}]:
+
+  root = os.path.realpath(os.path.join(self.test_root, test_suite['name']))
+
+  if test_suite['name'] == 'known-good':
+    known_good_failed_total, known_good_passed_total = self.run_test_set(root, os.listdir(root), test_suite['expected'])
+  elif test_suite['name'] == 'known-bad':
+    known_bad_failed_total, known_bad_passed_total = self.run_test_set(root, os.listdir(root), test_suite['expected'])
+  else:
+    failed, passed = self.run_test_set(root, os.listdir(root), test_suite['expected'])
+    passed_total += passed;
+    failed_total += failed;
+
+print &quot;\n%s Passed, %s Failed, %s Known Good, %s Known Good Expected to Fail but Passed, %s Known Bad, %s Known Bad Expected to Pass but Failed, %s Total&quot; % \
+        (passed_total, failed_total, known_good_passed_total, known_good_failed_total, known_bad_passed_total, known_bad_failed_total,
+        passed_total + failed_total + known_good_passed_total + known_good_failed_total + known_bad_passed_total + known_bad_failed_total)
+[/sourcecode]

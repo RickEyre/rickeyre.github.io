@@ -1,0 +1,128 @@
+---
+layout: post
+title: WebVTT 0.2 Release
+tags:
+- c
+- c parser
+- firefox
+- mozilla
+- Open Source
+- Seneca College
+- software
+- software-development
+- technology
+- w3c specification
+- webvtt
+- WEBVTT
+status: publish
+type: post
+published: true
+meta:
+  _wpas_done_1604135: '1'
+  publicize_reach: a:3:{s:7:"twitter";a:1:{i:1604132;i:5;}s:2:"fb";a:1:{i:1575533;i:214;}s:2:"wp";a:1:{i:0;i:3;}}
+  _wpas_done_1575533: '1'
+  _publicize_done_external: a:1:{s:8:"facebook";a:1:{i:503100574;b:1;}}
+  publicize_twitter_user: epsilon812
+  _wpas_done_1604132: '1'
+  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2012-10-17
+    02:21:23";}
+  _wpas_skip_1575533: '1'
+  _wpas_skip_1604132: '1'
+  _wpas_skip_1604135: '1'
+---
+For the 0.2 release the Professor got us to each sign up on different aspects of the development process. We could choose from many different categories:
+<ul>
+	<li>Documentation</li>
+	<li>Testing</li>
+	<li>Solving Bugs in other WebVTT projects such as the online <a href="http://quuz.org/webvtt/">JS Web Validator</a> or the C++ implementation in <a href="https://github.com/WebKit/webkit/tree/master/Source/WebCore/html/track">WebKit</a></li>
+	<li>Turning the JS Validator into a full blown JS Parser in order to be able to use that instead of the C parser on browsers that are to old to support the track element like IE8</li>
+	<li>Writing the C Parser</li>
+	<li>Fuzz testing</li>
+	<li>Maintaining the Build System</li>
+	<li>Continuous Integration (the process of compiling and running the build on every commit to GitHub in order to know if a commit has broken the code)</li>
+</ul>
+I chose to sign up for writing the C parser and also creating and maintaining the build system. Currently we have three teams of two people working on three separate implementations of the C parser. We are doing this in order to adhere to the design philosophy of 'write two and plan to throw one away'. When our 0.2 release lands we will go about selecting the best parts of each and integrating them into the real C parser that we will be releasing in the end.
+
+So far we, my partner and I, have started work on the C parser and we have ran into a few issues that we had to think about pretty hard. The first is that we are writing this in C and so it cannot be object oriented, but WebVTT assumes that you will be using OO. You can tell this by looking at the some of the terms they use to describe the data structure that the parser will be emitting. They talk about using classes and 'concrete classes' to define implementations of interfaces, etc.
+
+We started talking about this to class mates and we were trying to figure out ways to turn C into OO, but as soon as the Prof heard of this he told us - "When in C do as the Cs do". Which makes sense. You want to use the language as the way it was intended, otherwise we should just use C++. I know there are some ways you can work around Cs lack of OO to get a general approximation, but these are all clunky and generally obfuscate the code in my opinion.
+
+So we set out on trying to find a way to retain Cs lack of OO while generally conforming to an approximation of the specification. What we decided on doing was creating a kind of inheritance structure with structs by having a container struct that contains a void pointer, which points to the concrete struct, and an enumeration that identifies what that concrete struct is. This way the enumeration tells you what you must cast the void pointer too in order to get the appropriate data. The <a href="http://dev.w3.org/html5/webvtt/#webvtt-node-object">data structure</a> that the WebVTT specification asks for is a tree. InternalNodes that can contain other InternalNodes and LeafNodes which are terminal nodes i.e. those which cannot contain other nodes.
+
+Here is an example of what we came up with:
+
+[sourcecode language="cpp"]
+struct Node
+{
+	int mode;
+	union
+	{
+		struct InternalNode *internalNode;
+		struct LeafNode *leafNode;
+	};
+};
+
+struct InternalNode
+{
+	struct Node *nodes;
+
+	enum InternalNodeType internalNodeType;
+	void *concreteNode;
+};
+
+struct LeafNode
+{
+	enum LeafNodeType leafNodeType;
+	void *concreteNode;
+};
+[/sourcecode]
+
+
+The Node class is the base which can either be an implementation of LeafNode or InternalNode. Both of those implementations contain a void pointer and an enumeration that specifies what kind of struct the void pointer is. For example the InternalNode enumeration might be Bold, Italic, etc. The InternalNode class also has a list of Node structs that contains the nodes nested within it.
+
+In this way if we wanted to render a Bold WebVTT cue text we would (in pseudocode):
+
+[sourcecode language="cpp"]
+if (mode == 1)
+{
+	switch (node-&gt;internalNode-&gt;internalNodeType)
+	{
+		case Bold:
+			RenderBold((struct BoldNode)node-&gt;internalNode-&gt;concreteNode);
+	}
+}
+[/sourcecode]
+
+
+I don't know if this is the easiest, or best way of doing this, but I guess that's what learning is for!
+
+One of the other interesting things that we have implemented is a struct called WebVttBufferInfo that keeps track of the buffer information of the WebVTT file. That looks like this so far:
+
+[sourcecode language="cpp"]
+struct WebVttBufferInfo
+{
+	// Will hold the input buffer
+	char *inputBuffer;
+	// Pointer into input buffer that denotes the current position
+	char *position;
+	// Represents a line that has been collected from the input buffer i.e. from beginning of line until CR(LF)
+	char *currentLine;
+
+	enum WebVttBufferInfoState state;
+};
+[/sourcecode]
+
+
+If you want to check out the work done so far you can go <a href="https://github.com/RickEyre/webvtt/tree/c-parser/webvtt-parser-new">here</a>.
+
+I have not started anything for the build system yet. That is mainly because my partner and I wanted to get the C parser more fleshed out first so we could more easily see what we needed to divide up. At that point, which I think we will reach in a day or two, we can assign different things and I can step away from it for some time to take a look at the build system.
+
+I do know that for the build system we will need to:
+<ul>
+	<li>Create an auto configure file to check and configure our build environment before we build</li>
+	<li>Make the build environment capable of cross platform development - Linux, OSX, and Windows</li>
+	<li>There are also some bugs that I need to take care of having to do with correct test failure and pass counting</li>
+</ul>
+We got a lot ahead of ourselves. The 0.2 release is due on Oct 29, so I have to get back to work!!
+
+See yeah.

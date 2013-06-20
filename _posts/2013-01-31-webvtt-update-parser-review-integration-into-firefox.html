@@ -1,0 +1,75 @@
+---
+layout: post
+title: 'WEBVTT Update: Parser Review, Integration into Firefox'
+tags:
+- bugzilla
+- dom
+- firefox
+- gecko
+- html text track
+- mozilla
+- Open Source
+- parser code
+- Seneca College
+- software
+- software-development
+- technology
+- text track
+- w3c specification
+- webvtt
+- WEBVTT
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  _wpas_done_1604135: '1'
+  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";i:27352422;s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2013-01-31
+    05:17:45";}
+  publicize_twitter_user: epsilon812
+  _wpas_done_1604132: '1'
+  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:384903786;b:1;}}
+  publicize_reach: a:2:{s:7:"twitter";a:1:{i:1604132;i:24;}s:2:"wp";a:1:{i:0;i:8;}}
+---
+<p style="text-align:justify;">For the last two weeks we've been working steadily on the WEBVTT parser. Most of the work being done now is related to getting the parser integrated into Firefox. We're building on top of the original <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=629350">bug</a> filed on bugzilla by Ralph and are now using it as a co-ordination bug for the five other bugs we've split it up into. The "bug sections" that we've split it up into are:</p>
+
+<ul style="text-align:justify;">
+	<li><span style="line-height:13px;">Integrating the webvtt build system into the Firefox build system.</span></li>
+	<li>Adding a captions div to an nsVideoFrame so the captions can be rendered on screen.</li>
+	<li>Creating a "Text Track Decoder" that will function as the entry point for Gecko into the webvtt parser.</li>
+	<li>Creating new DOM bindings i.e. TextTrack, TextTrackCue, TextTrackCueList.</li>
+	<li>Creating DOM tests using Mochitest for the new DOM bindings.</li>
+</ul>
+<p style="text-align:justify;">You can check out a more in depth break down of our bug plan <a href="http://zenit.senecac.on.ca/wiki/index.php/WebVTT_Bug_Filing_Plan">here</a>.</p>
+<p style="text-align:justify;">The other major thing that a few of us in the class have been engaged in is the <a href="https://github.com/mozilla/webvtt/issues?state=open">review</a> of the 0.4 parser code. The review is still in it's early to mid stages, so we have a lot more to do on that. I've been participating there by filing and commenting on issues and fixing a few of the bugs that have surfaced.</p>
+<p style="text-align:justify;">We've also moved the parser code over to the <a href="https://github.com/mozilla/webvtt/tree/dev">mozilla webvtt</a> repository on GitHub (yay!) and have landed the 0.4 parser code there in a dev branch. After the review is done it will be landed on the master branch.</p>
+
+<h2 style="text-align:justify;">Firefox Integration</h2>
+<p style="text-align:justify;">I've been working on the Text Track Decoder for the parser integration into Firefox. This part of the integration functions as an entry point into our parser for Gecko.</p>
+
+<h3 style="text-align:justify;">How It Works</h3>
+<p style="text-align:justify;">The short version of how the Text Track Decoder works is that when an <a href="https://github.com/RickEyre/mozilla-central/blob/text-track-decoder/content/html/content/src/HTMLTrackElement.cpp">HtmlTrackElement</a> receives new data from a vtt byte stream it passes it off to it's <a href="https://github.com/RickEyre/mozilla-central/blob/text-track-decoder/content/html/content/src/WebVTTLoadListener.cpp">WebVTTLoadListener</a> (Text Track Decoder) which then calls our webvtt parser to parse the chunk of the byte stream it just reveived. The WebVTTLoadListener also provides call back functions to the parser for passing back cues when the parser has finished them or for reporting errors when the parser encounters them. The final function that the WebVTTLoadListener facilitates is converting the cues that have been passed back in the call back function to the various DOM elements that represent a webvtt_cue and then attaching those to either the HtmlTrackElement's track, in the case of the cue settings, or the HtmlTrackElement's MediaElement's video div caption overlay (phew), in the case of the parsed webvtt cue text node tree.</p>
+
+<h3 style="text-align:justify;">What We've Done</h3>
+<p style="text-align:justify;">The first order of business that we took care of in getting this done was to ask Chris Pearce, who works very closely with Firefox's media stuff, to give us a high level overview of what we would need to accomplish in order to get this working. That was sent in the form of an email which my Professor, Dave Humphrey, then kindly <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=833382#c2">posted</a> on our bug (I forgot to do so!).</p>
+<p style="text-align:justify;">We then quickly went about implementing Chris's initial steps that he talked about. We've done steps 1 - 4 so far:</p>
+
+<ul style="text-align:justify;">
+	<li><span style="line-height:13px;">The HtmlTrackElement::LoadListener has been moved to it's own file and renamed WebVTTLoadListener.</span></li>
+	<li>The HtmlTrackElement now has a WebVTTLoadListener reference which is initialized in LoadResource.</li>
+	<li>WebVTTLoadListener now manages a single webvtt parser which is created and destroyed along with it.</li>
+	<li>WebVTTLoadListener now provides call back functions to the parser for returning finished cues and reporting errors.</li>
+</ul>
+We've also added three convenience functions to turn webvtt cue stuff into the DOM bindings. These are:
+<ul>
+	<li style="text-align:justify;"><a href="https://github.com/RickEyre/mozilla-central/blob/text-track-decoder/content/html/content/src/WebVTTLoadListener.cpp#L65">cCueToDomCue</a> - Transforms a webvtt cue's settings into a TextTrackCue <strong>(almost done)</strong>.</li>
+	<li style="text-align:justify;"><a href="https://github.com/RickEyre/mozilla-central/blob/text-track-decoder/content/html/content/src/WebVTTLoadListener.cpp#L103">cNodeToHtmlElement</a> -  Transforms a webvtt node into an HtmlElement; recursively adds HtmlElements to it's children if it is converting an internal webvtt node <strong>(not done at all!)</strong>.</li>
+	<li style="text-align:justify;"><a href="https://github.com/RickEyre/mozilla-central/blob/text-track-decoder/content/html/content/src/WebVTTLoadListener.cpp#L87">cNodeListToDocumentFragment</a> - Transforms the head node's children into HtmlElements and adds them to a DocumentFragment <strong>(pretty much done)</strong>.</li>
+</ul>
+The call back function for returning cues now:
+<ul>
+	<li style="text-align:justify;">Calls the cCueToDomCue function and adds the resulting HtmlTextTrackCue to it's owning HtmlTrackElements cue list.</li>
+	<li style="text-align:justify;">Calls the cNodeListToDocumentFragment and adds the resulting DocumentFragment to the caption overlay.</li>
+</ul>
+<p style="text-align:justify;">Right now we've run into some problems in figuring out how to work with the Firefox code. I've listed those in my recent <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=833382#c3">WIP update</a> on the bug. Other then implementing those steps I've just been getting acquainted with the Firefox code that we have to touch and figuring out the basics of how it's all going to fit in. I think we've gotten a big chunk of it done so far, mostly the overall frame of how it's going to work as well as turning a webvtt cue's settings into a TextTrackCue. I've also met the deadlines and goals that I set for <a href="http://epsilon812.wordpress.com/2013/01/10/webvtt-in-2013/">myself</a> at the beginning of this semester, so I'm fairly happy. Going forward I think I know enough now to ask intelligent questions about how to solve the problems that I listed in the WIP, so that's what I will be doing in the coming weeks when I get stuck.</p>
+<p style="text-align:justify;">As always, I'm ever confident that we will finish the project!</p>

@@ -1,0 +1,137 @@
+---
+layout: post
+title: 'WEBVTT: Refactoring the Parser'
+tags:
+- c
+- Open Source
+- seneca
+- Seneca College
+- software
+- software-development
+- technology
+- w3c specification
+- webvtt
+- WEBVTT
+status: publish
+type: post
+published: true
+meta:
+  _publicize_pending: '1'
+  _wpas_done_1604135: '1'
+  _wpas_done_1575533: '1'
+  _publicize_done_external: a:1:{s:8:"facebook";a:1:{i:503100574;b:1;}}
+  publicize_twitter_user: epsilon812
+  _wpas_done_1604132: '1'
+  publicize_reach: a:3:{s:7:"twitter";a:1:{i:1604132;i:24;}s:2:"fb";a:1:{i:1575533;i:217;}s:2:"wp";a:1:{i:0;i:8;}}
+  _wpas_skip_1575533: '1'
+  _wpas_skip_1604132: '1'
+  _wpas_skip_1604135: '1'
+  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2013-01-17
+    16:54:58";}
+---
+So I've been working on refactoring the parser a bit over the last week. I talked about this in the one of my previous <a href="http://epsilon812.wordpress.com/2012/12/06/webvtt-refactoring-the-parser/">posts</a>. You can check out the work I've done so far on my <a href="https://github.com/RickEyre/webvtt/tree/parser-refactor-2">GitHub</a>.
+<h2>Squashing Code is Nice</h2>
+So I have successfully squashed the node and cuetext token data code and it's worked out nicely. This reduces the overall amount of code that needs to be written and the complexity of the code that needs to be written to access those structs. Heres what they look like now:
+
+Token:
+
+[sourcecode language="cpp"]
+struct
+webvtt_cuetext_token_t {
+  webvtt_cuetext_token_type token_type;
+  webvtt_string tag_name; // Only used for start token and end token types.
+  union {
+    webvtt_string text;
+    webvtt_timestamp time_stamp;
+    webvtt_cuetext_start_token_data *start_token_data;
+  };
+};
+
+/**
+* Represents a start tag in the cue text.
+* These take the form of &lt;[TAG_NAME].[CLASSES] [POSSIBLE_ANNOTATION]&gt; in the cue text.
+*/
+struct
+webvtt_cuetext_start_token_data_t {
+  webvtt_string_list *css_classes;
+  webvtt_string annotations;
+};
+[/sourcecode]
+
+Node:
+
+[sourcecode language="cpp"]
+struct
+webvtt_node_t {
+  /**
+  * The specification asks for uni directional linked list, but we have added a parent
+  * node in order to facilitate an iterative cue text parsing solution.
+  */
+  webvtt_node *parent;
+  webvtt_node_kind kind;
+
+  union {
+    webvtt_string text;
+    webvtt_timestamp time_stamp;
+    webvtt_internal_node_data *internal_data;
+  };
+};
+
+struct
+webvtt_internal_node_data_t {
+  webvtt_string annotation;
+  webvtt_string_list *css_classes;
+
+  webvtt_uint alloc;
+  webvtt_uint length;
+  webvtt_node **children;
+};
+[/sourcecode]
+
+Here is one example how it simplifies the code:
+
+Before:
+
+[sourcecode language="cpp"]
+if( webvtt_create_node_from_token( token_ptr, &amp;temp_node_ptr, current_node_ptr ) != WEBVTT_SUCCESS )
+  /* Do something here? */
+  continue;
+  else
+  {
+  webvtt_attach_internal_node( (webvtt_internal_node_ptr)current_node_ptr-&gt;concrete_node, temp_node_ptr );
+  if( WEBVTT_IS_VALID_INTERNAL_NODE( temp_node_ptr-&gt;kind ) )
+    current_node_ptr = temp_node_ptr;
+  }
+}
+[/sourcecode]
+
+After:
+
+[sourcecode language="cpp"]
+if( webvtt_create_node_from_token( token, &amp;temp_node, current_node ) != WEBVTT_SUCCESS )
+  /* Do something here? */
+  { continue; }
+  else {
+    webvtt_attach_internal_node( current_node, temp_node );
+     if( WEBVTT_IS_VALID_INTERNAL_NODE( temp_node-&gt;kind ) )
+       { current_node = temp_node; }
+      }
+  }
+}
+[/sourcecode]
+<h2>Tokens vs Nodes</h2>
+In my last blog post about refactoring the parser I talked about removing the token stuff and instead just using webvtt_node straight away. I haven't done that yet because I have discovered a problem with it. The problem is that tokens have a way of representing an end tag
+whereas nodes do not. This is important because when the tokenizer returns an end tag token a new node is not instantiated, instead the current node will change to the current nodes parent. Therefore, since a node has no idea of what an end tag is it cannot replace a token... yet.
+I'm still not convinced that we can't do this in some way.
+<h2>Those Pesky Pointer Typedefs</h2>
+I've also begun to remove all the pointer typedefs I've been using throughout my code. I liked it at first, but now that I have been thinking about it just using straight pointer notation is probably better.
+<ol>
+	<li>It's more clear as to what is actually going on.</li>
+	<li>I was typedef-ing pointers as a [object]_ptr. So if I instead just use pointer notation it will decrease the character count everywhere. Instead of [object]_ptr everywhere we will just have *[object].</li>
+</ol>
+<h2>Memory Leaks in C++ Bindings</h2>
+The last thing I have done for now is  changed the C++ bindings over to instantiate the entire tree of nodes when the cue is created. This way the cue knows about the nodes and will be able to release them at the end if it's lifespan. In this way we can avoid memory leaks.
+<h2>UTF16 to UTF8</h2>
+The final thing that I need to do is get the parser using UTF8 instead of UTF16. Caitlin is currently doing a major overhaul on the webvtt_string stuff to change it from using UTF16 to instead use our webvtt_byte which is straight UTF8. That way we can have all those nice string functions that we created for UTF16 with our UTF8 stuff.
+<h2>Forward to Review</h2>
+I'm looking to get this done as well as debugging the unit tests by Friday. Then I believe the parser will be ready for review.
