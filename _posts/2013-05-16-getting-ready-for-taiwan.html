@@ -2,53 +2,28 @@
 layout: post
 title: Getting Ready For Taiwan
 tags:
-- CDOT
-- cdot
-- gecko
-- html track element
-- htmltrackelement
-- iterate node tree
-- iteration
 - mozilla
-- Mozilla
-- mozilla taiwan
-- Open Source
-- recursion
-- seneca
-- Seneca College
-- seneca college
-- track element
-- webvtt
-- WEBVTT
+- open-source
 status: publish
 type: post
 published: true
-meta:
-  _publicize_pending: '1'
-  publicize_twitter_user: epsilon812
-  _wpas_done_1604135: '1'
-  publicize_reach: a:2:{s:7:"twitter";a:1:{i:1604132;i:33;}s:2:"wp";a:1:{i:0;i:9;}}
-  _wpas_done_1604132: '1'
-  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:384903786;b:1;}}
-  _wpas_skip_1604132: '1'
-  _wpas_skip_1604135: '1'
-  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2013-05-16
-    20:08:39";}
 ---
-A month back I found out that Caitlin and I were being invited to Mozilla's Web Rendering Week in Taiwan. Needless to say I was shocked. <a href="https://twitter.com/rillian">Ralph Giles</a>, who has been working with us closely on WEBVTT and was/is our main contact with Mozilla for WEBVTT, kindly invited us out -- thanks Ralph!!
+<p>A month back I found out that Caitlin and I were being invited to Mozilla's Web Rendering Week in Taiwan. Needless to say I was shocked. <a href="https://twitter.com/rillian">Ralph Giles</a>, who has been working with us closely on WEBVTT and was/is our main contact with Mozilla for WEBVTT, kindly invited us out -- thanks Ralph!!</p>
 
-Therefore, a lot of this week has been spent getting ready for the trip -- getting ready to travel and trying to push on some final bugs to get initial support for WEBVTT into Nightly before we leave.
+<p>Therefore, a lot of this week has been spent getting ready for the trip -- getting ready to travel and trying to push on some final bugs to get initial support for WEBVTT into Nightly before we leave.</p>
 
-Getting that initial support entailed a few things, all of which haven't happened yet... Don't worry though! If we don't get it finished before Taiwan we will definitely get it finished while we're in Taiwan. We need(ed) too:
+<p>Getting that initial support entailed a few things, all of which haven't happened yet... Don't worry though! If we don't get it finished before Taiwan we will definitely get it finished while we're in Taiwan. We need(ed) too:</p>
+
 <ul>
 	<li>Get the WEBVTT library to a state where we felt comfortable tagging 0.5 and landing it in Gecko.</li>
 	<li>Land the DOM implementation of HTMLTrackElement and the TextTrack objects.</li>
 	<li>Land the parser and Gecko integration bug.</li>
 </ul>
-Getting WEBVTT to <a href="https://github.com/mozilla/webvtt/tree/v0.5">0.5</a> was pretty easy. The only extra thing we wanted to add before 0.5 was support for the <a href="https://github.com/mozilla/webvtt/commit/b60498989f7e2d8696d5d7918f8e489a54ae7335">new &lt;lang&gt; tag</a>. We needed a new <a href="https://github.com/mozilla/webvtt/commit/fe00a14ec5badafac0c6769e769a3fa7b6e1c53e">string list pop function</a> for that as well. I implemented that this week, which also exposed a bug that we hadn't found yet because we didn't have a proper test for it. The bug happened when we had an &lt;rt&gt; tag that was not enclosed within a &lt;ruby&gt; tag. In these situations the &lt;rt&gt; tag should not be processed. We weren't handling it correctly and it was crashing the parser. That got <a href="https://github.com/mozilla/webvtt/commit/81e5d076b7ed9f959c3a517ea095cee605cb23cf">landed</a> as well yesterday. We tagged 0.5 and Caitlin is working on the <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=872822">bug</a> to land it in Gecko now. WEBVTT 0.5 contains a lot of good things like sec-critical bug fixes and library usability fixes.
 
-Ralph is very close to <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=833385">landing the DOM implementation</a>. That should be happening within the next few days. The parser integration is getting close as well. I've been working on changing the code that converts the C node tree to a DOM tree from a recursive algorithm to an iterative one. It's been a little tricky as we need to keep track of where we are in the C tree as we iterate over it, as well as where we are in the tree of DOM nodes that we are creating. We also need to keep track of the 'last branching parent' so that we're able to tell when we need to go back up the tree. I have a <a href="https://github.com/RickEyre/mozilla-central/commit/1344e315e74cf89528d53fef74b9257684b97a70">solution</a> that I put together that will hopefully be able to get an r+. I'll have it up for review tonight on the <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=833382">bug</a>.
+<p>Getting WEBVTT to <a href="https://github.com/mozilla/webvtt/tree/v0.5">0.5</a> was pretty easy. The only extra thing we wanted to add before 0.5 was support for the <a href="https://github.com/mozilla/webvtt/commit/b60498989f7e2d8696d5d7918f8e489a54ae7335">new &lt;lang&gt; tag</a>. We needed a new <a href="https://github.com/mozilla/webvtt/commit/fe00a14ec5badafac0c6769e769a3fa7b6e1c53e">string list pop function</a> for that as well. I implemented that this week, which also exposed a bug that we hadn't found yet because we didn't have a proper test for it. The bug happened when we had an &lt;rt&gt; tag that was not enclosed within a &lt;ruby&gt; tag. In these situations the &lt;rt&gt; tag should not be processed. We weren't handling it correctly and it was crashing the parser. That got <a href="https://github.com/mozilla/webvtt/commit/81e5d076b7ed9f959c3a517ea095cee605cb23cf">landed</a> as well yesterday. We tagged 0.5 and Caitlin is working on the <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=872822">bug</a> to land it in Gecko now. WEBVTT 0.5 contains a lot of good things like sec-critical bug fixes and library usability fixes.</p>
 
-The other major thing I did this week was give a presentation to CDOT about WEBVTT. You can check out the presentation over on my <a href="http://rickeyre.github.io/webvtt-presentation/#/step-1">GitHub page</a>. It was recorded so maybe you all can see it at some point when it gets posted! I'll link at that time.
+<p>Ralph is very close to <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=833385">landing the DOM implementation</a>. That should be happening within the next few days. The parser integration is getting close as well. I've been working on changing the code that converts the C node tree to a DOM tree from a recursive algorithm to an iterative one. It's been a little tricky as we need to keep track of where we are in the C tree as we iterate over it, as well as where we are in the tree of DOM nodes that we are creating. We also need to keep track of the 'last branching parent' so that we're able to tell when we need to go back up the tree. I have a <a href="https://github.com/RickEyre/mozilla-central/commit/1344e315e74cf89528d53fef74b9257684b97a70">solution</a> that I put together that will hopefully be able to get an r+. I'll have it up for review tonight on the <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=833382">bug</a>.</p>
 
-Until next time.
+<p>The other major thing I did this week was give a presentation to CDOT about WEBVTT. You can check out the presentation over on my <a href="http://rickeyre.github.io/webvtt-presentation/#/step-1">GitHub page</a>. It was recorded so maybe you all can see it at some point when it gets posted! I'll link at that time.</p>
+
+<p>Until next time.</p>

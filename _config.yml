@@ -3,7 +3,7 @@ markdown: rdiscount
 permalink: date
 exclude: [README.md]
 timezone: Canada/Eastern
-paginate: 5
+paginate: 12
 
 # Site wide variables
 title: Technological Ramblings
