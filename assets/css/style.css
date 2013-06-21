@@ -27,11 +27,6 @@ ul {
   padding-right: 20px;
 }
 
-.post-content {
-  padding-top: 10px;
-  padding-bottom: 10px;
-}
-
 .tag-line {
   line-height:1;
   color:#999;
@@ -43,13 +38,8 @@ ul {
   color:#999;
 }
 
-.tag-line-post {
-  vertical-align: middle;
-}
-
-.text-middle {
-  display: table;
-  vertical-align: middle;
+.disqus {
+  padding-top: 10px;
 }
 
 .caption {
