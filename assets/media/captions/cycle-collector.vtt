@@ -4,8 +4,8 @@ WEBVTT
 <v Kyle Huey> Not ready yet? Alright, I'll wait until the camera man tells me we're good.
 
 00:04.000 --> 00:05.000
-<v Chris Pearce> Okay we're good now.
-<v Kyle Huey> Oh now we're good?
+<v Chris Pearce> Okay, we're good now.</v>
+<v Kyle Huey> Oh, now we're good?</v>
 <i>Laughter</i>
 
 00:06.000 --> 00:15.000
@@ -60,7 +60,7 @@ WEBVTT
 <v Kyle Huey> And so the cycle collector also helps take care of these things.
 
 02:34.000 --> 02:43.000
-<v Kyle Huey> And the third thing the cycle collector does -- and technically this doesn't happen in the cycle collector right now, but it will in about two weeks it will.
+<v Kyle Huey> And the third thing the cycle collector does -- and technically this doesn't happen in the cycle collector right now, but in about two weeks it will...
 
 02:44.000 --> 02:50.000
 <v Kyle Huey> Is it allows you to own Javascript objects.
@@ -90,7 +90,7 @@ WEBVTT
 <v Kyle Huey> So that's the basic idea!
 
 03:47.000 --> 03:55.000
-<v Kyle Huey> And the way this works is that C++ objects opt-in to cycle collection.
+<v Kyle Huey> And the way this works is that C++ classes opt-in to cycle collection.
 
 03:56.000 --> 03:58.000
 <v Kyle Huey> I'm going to erase this now.
@@ -99,7 +99,7 @@ WEBVTT
 <v Kyle Huey> Yeah, hopefully I don't knock this over.
 
 04:11.000 --> 04:16.000
-<v Kyle Huey> So! C++ classes opt-in to cycle collect.
+<v Kyle Huey> So! C++ classes opt-in to cycle collection.
 
 04:17.000 --> 04:26.000
 <v Kyle Huey> So unlike when when you write an object in Javascript or code in Javascript everything participates in garbage collection and there's nothing you have to do, everything just works
@@ -358,13 +358,13 @@ And you don't have to do anything special, say, if XP connect is doing things fo
 15:06.000 --> 05:12.000
 <v Daniel> When you say that there are no referenes outside that it doesn't know about, your talking about just lookin at the counts? It doesn't actually know about all the global references?
 
-05:13.000 --> 05:21.000
+15:13.000 --> 15:21.000
 <v Kyle> Yeah, so the cycle collector only knows about things that opt-int to cycle collection. So if there are references from somewhere outside of that then it doesn't know about that.
 
-05:22.000 --> 05:31.000
+15:22.000 --> 15:31.000
 <v Kyle> So for example, if there is an ns com pointer on the stack that holds a reference to a cycle collected object, the cycle collector doesn't know anything about the stack.
 
-05:32.000 --> 15:40.000
+15:32.000 --> 15:40.000
 <v Kyle> And that's very intentional. So in that case you have an object graph that's going to look something like... here I'll make it very simple.
 
 15:42.000 --> 15:51.000
