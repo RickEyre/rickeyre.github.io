@@ -4,6 +4,8 @@ title: 'WEBVTT: All the Bugs.'
 tags:
 - mozilla
 - open-source
+- cdot
+- seneca college
 status: publish
 type: post
 published: true
@@ -19,13 +21,13 @@ published: true
 
 <p>Do all these things and you should see subtitles! It's been about six months of work on and off now in school and afterwards to get this initial support working on Firefox so it's pretty amazing to see it working.</p>
 
-<h2>What's Left to Do -- Everything</h2>
+<h3>What's Left to Do -- Everything</h3>
 
 <p>The thing that we have next on our plate is to fix up our current implementation so that we meet the spec requirements. We have a lot left to do to bridge that gap... In regards to this I spent Thursday last week going through the spec, figuring out the outline of what we <em>may</em> need to do to get our implementation up to date, and logged bugs about it. I logged a ton of them and there are still more hiding in the spec, so there really is a lot of work left to do. Hopefully, this will give us more clarity around what needs/may need to happen in implementing the spec. If it turns out we don't need/want to implement something internally that the spec recommends we should then these bugs will at least serve as a place to discuss and document those decisions.</p>
 
 <p>Just last Friday we had one of these particular incidents. The spec recommends that we use an 'active flag' to keep track of which cues are currently active, or showing, on the screen. The problem with this is that it would require us to iterate through the entire cue list and check which cues have the active flag set every time we want to update the rendering of the captions. This isn't very efficient and it's an internal detail to the spec i.e. it would never be exposed to the user so we have some leeway to implement this in ways that make sense for Gecko. What we decided on is that we will keep the main cue list of a text track sorted which will make it very easy for us to keep track of the active cues based on the current play back time. I've done some work for that <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=883173">here</a>.</p>
 
-<h2>Testing</h2>
+<h3>Testing</h3>
 
 <p>Unfortunately, the main <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=833386">bug for tests</a> along with Caitlin's new <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=882131">tests</a> for making sure that we don't display cues that have malformed time stamps still haven't landed. We've had problem after problem with these. The newest of them being that they don't pass on android for some reason. I suspect the track data isn't being loaded properly so we keep waiting in the test for this to happen and it eventually times out.</p>
 
@@ -33,11 +35,11 @@ published: true
 
 <p>Hopefully, we can have these tests landed by this week... we shall see though. It depends on how quickly this Android debugging goes for me..</p>
 
-<h2>Time Flies</h2>
+<h3>Time Flies</h3>
 
 <p>The rest of my time these last few weeks has been taken up with relatively small things that build up on each other, like commenting on bugs, reading the spec (which can take forever as it's fairly complicated), helping out Marcus, giving feedback on patches, planning to figure out what is the best thing to do next, etc. Hopefully, we can get WebVTT in Firefox up to spec soon, we'll have to see though.</p>
 
-<h2>Getting Involved</h2>
+<h3>Getting Involved</h3>
 
 <p>If you are interested and wanting to get involved I would really encourage you to come out and become a contributor. There really is a <strong>ton</strong> of work left to do -- for the <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=webvtt">implementation of the track spec</a> as well as for libwebvtt (the C parser). You can get in touch with the current contributors via a number of ways -- Mozilla's <a href="https://lists.mozilla.org/listinfo/dev-media">dev media mailing list</a>, the #media IRC channel on irc.mozilla.org, or on the <a href="https://github.com/mozilla/webvtt">mozilla/webvtt GitHub page</a>. Check out the <a href="https://wiki.mozilla.org/WebVTT">WebVTT wiki</a> page for more information on how to get involved.</p>
 

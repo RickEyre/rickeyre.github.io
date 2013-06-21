@@ -2,42 +2,21 @@
 layout: post
 title: 'Connected Wellness: Upgrading Cordova 2.0 to 2.3'
 tags:
-- apache
-- apache cordova
-- apple
-- apple developer
-- bluetooth
-- CDOT
-- cdot
-- Connected Wellness
-- cordova
-- NexJ
-- nexj
-- objective-c
-- Open Source
-- phonegap
-- Seneca College
 - seneca college
-- software
-- software-development
-- technology
-- xcode
+- open-source
+- cdot
 status: publish
 type: post
 published: true
-meta:
-  _publicize_pending: '1'
-  publicize_reach: a:2:{s:7:"twitter";a:1:{i:1604132;i:23;}s:2:"wp";a:1:{i:0;i:8;}}
-  publicize_twitter_user: epsilon812
-  _wpas_done_1604132: '1'
-  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:384903786;b:1;}}
-  _wpas_done_1604135: '1'
-  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2013-02-02
-    00:45:17";}
 ---
-<p style="text-align:justify;">We've gotten quite a lot of work done this week in the Connected Wellness project. However, we're getting close to a point where we might not be able to do any work until we get Apple Developer licenses. Most of the preliminary development has been done and we now need to start testing cod; to do that we need those licenses! I heard from Carl that it's being worked on and we should have them soon, so I'm hopeful.</p>
-<p style="text-align:justify;">Other than that we had a big review on Catilin's packet parser <a href="https://bitbucket.org/nexj/mobile-bluetooth-adapters/pull-request/27/issue-20-packetparser-implementation/diff">implementation</a>. I probably spent a few hours just reviewing that alone. I also went around cleaning up a few of the issues such as <a href="https://bitbucket.org/nexj/mobile-bluetooth-adapters/pull-request/28/remove-disable-and-enable-commands/diff">removing</a> commands that we aren't able to implement yet due to not being able to fully control Bluetooth on Apple Devices and <a href="https://bitbucket.org/nexj/mobile-bluetooth-adapters/pull-request/30/add-stopcommand-file-structure-changes">implementing</a> the last few <a href="https://bitbucket.org/nexj/mobile-bluetooth-adapters/pull-request/32/add-listencommand-and-issupportedcommand/diff">commands</a>.</p>
-<p style="text-align:justify;">The biggest thing that I've done this week is to include the Cordova library into the mercurial repo and get it set up so that it is incorporated into the Xcode project out of the box. This way we don't have to set it up manually every time we clone a fresh repo (that was getting tiring). It took a little bit of figuring out how to do this, but what ended up working was to include the library file along with the header files of the library (Apple requires header files for statically linked libraries to be somewhere in the project). After I did this I needed to add the folder that holds the library and header files to the required frameworks list of the project, modify the header search paths to include the directory where the library's headers are, and set the linker up to link with the library by giving it the path to the .a file. All these options can be found in the "build settings" tab of the build target in Xcode i.e. the project file.</p>
-<p style="text-align:justify;">After I got the library incorporated into the repo I went about moving our current code to support Cordova 2.3 (we were on 2.0 before). This proved to be very easy. The only things that changed were the include paths of the Cordova headers when #import-ing them, the function signature of the method that Cordova calls in the plugin, and the way that Plugin Results are passed back to Cordova. It was actually easier moving to 2.3 than it was to code 2.0 because they've made it a lot more easier and intuitive to work with.</p>
-<p style="text-align:justify;">You can check out that code in the pull request <a href="https://bitbucket.org/nexj/mobile-bluetooth-adapters/pull-request/36/cordova-23-library-added">here</a>.</p>
-<p style="text-align:justify;">After that pull request lands there's only going to be one last thing to code - the stopListeningCommand. That will probably not be hard. I'm hoping that we will be able to get those Apple Developer licenses early next week so we can continue powering through this. It <em>is</em> due by the end of February...</p>
+<p>We've gotten quite a lot of work done this week in the Connected Wellness project. However, we're getting close to a point where we might not be able to do any work until we get Apple Developer licenses. Most of the preliminary development has been done and we now need to start testing cod; to do that we need those licenses! I heard from Carl that it's being worked on and we should have them soon, so I'm hopeful.</p>
+
+<p>Other than that we had a big review on Catilin's packet parser <a href="https://bitbucket.org/nexj/mobile-bluetooth-adapters/pull-request/27/issue-20-packetparser-implementation/diff">implementation</a>. I probably spent a few hours just reviewing that alone. I also went around cleaning up a few of the issues such as <a href="https://bitbucket.org/nexj/mobile-bluetooth-adapters/pull-request/28/remove-disable-and-enable-commands/diff">removing</a> commands that we aren't able to implement yet due to not being able to fully control Bluetooth on Apple Devices and <a href="https://bitbucket.org/nexj/mobile-bluetooth-adapters/pull-request/30/add-stopcommand-file-structure-changes">implementing</a> the last few <a href="https://bitbucket.org/nexj/mobile-bluetooth-adapters/pull-request/32/add-listencommand-and-issupportedcommand/diff">commands</a>.</p>
+
+<p>The biggest thing that I've done this week is to include the Cordova library into the mercurial repo and get it set up so that it is incorporated into the Xcode project out of the box. This way we don't have to set it up manually every time we clone a fresh repo (that was getting tiring). It took a little bit of figuring out how to do this, but what ended up working was to include the library file along with the header files of the library (Apple requires header files for statically linked libraries to be somewhere in the project). After I did this I needed to add the folder that holds the library and header files to the required frameworks list of the project, modify the header search paths to include the directory where the library's headers are, and set the linker up to link with the library by giving it the path to the .a file. All these options can be found in the "build settings" tab of the build target in Xcode i.e. the project file.</p>
+
+<p>After I got the library incorporated into the repo I went about moving our current code to support Cordova 2.3 (we were on 2.0 before). This proved to be very easy. The only things that changed were the include paths of the Cordova headers when #import-ing them, the function signature of the method that Cordova calls in the plugin, and the way that Plugin Results are passed back to Cordova. It was actually easier moving to 2.3 than it was to code 2.0 because they've made it a lot more easier and intuitive to work with.</p>
+
+<p>You can check out that code in the pull request <a href="https://bitbucket.org/nexj/mobile-bluetooth-adapters/pull-request/36/cordova-23-library-added">here</a>.</p>
+
+<p>After that pull request lands there's only going to be one last thing to code - the stopListeningCommand. That will probably not be hard. I'm hoping that we will be able to get those Apple Developer licenses early next week so we can continue powering through this. It <em>is</em> due by the end of February...</p>

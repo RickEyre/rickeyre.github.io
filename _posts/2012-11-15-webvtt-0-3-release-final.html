@@ -2,47 +2,29 @@
 layout: post
 title: 'WebVTT 0.3 Release : Final'
 tags:
-- c
-- c parser
-- firefox
-- Open Source
+- seneca college
 - mozilla
-- seneca
-- Seneca College
-- software
-- software-development
-- technology
-- w3c specification
-- webvtt
-- WEBVTT
 - open-source
 status: publish
 type: post
 published: true
-meta:
-  _wpas_done_1604135: '1'
-  publicize_twitter_user: epsilon812
-  _wpas_done_1604132: '1'
-  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:384903786;b:1;}}
-  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2012-11-15
-    14:36:22";}
-  _wpas_skip_1604132: '1'
-  _wpas_skip_1604135: '1'
 ---
-<span style="color:#888888;"></span>Today our 0.3 release is due for the WebVTT parser. I've completed the cue text parsing portion of the parser and it's sitting on my <a href="https://github.com/RickEyre/webvtt/tree/cue-text-parser-done">GitHub </a>repo. The main places you can look for the code I have added are:
+<p>Today our 0.3 release is due for the WebVTT parser. I've completed the cue text parsing portion of the parser and it's sitting on my <a href="https://github.com/RickEyre/webvtt/tree/cue-text-parser-done">GitHub </a>repo. The main places you can look for the code I have added are:</p>
+
 <ul>
 	<li><a href="https://github.com/RickEyre/webvtt/blob/cue-text-parser-done/src/libwebvtt/cuetext.c">cuetext</a></li>
 	<li><a href="https://github.com/RickEyre/webvtt/blob/cue-text-parser-done/src/libwebvtt/cue.c">cue</a></li>
 	<li><a href="https://github.com/RickEyre/webvtt/blob/cue-text-parser-done/src/libwebvtt/string.c">string</a></li>
 	<li><a href="https://github.com/RickEyre/webvtt/blob/cue-text-parser-done/src/parsevtt/parsevtt_main.c">parser_main</a></li>
 </ul>
-Much of what I discussed in my last blog post has stayed the same with my final version of the 0.3 release. The major structure of the algorithm has stayed the same. However, I have made changes to some of the syntax in order to get rid of minor bugs. I won't re-post all that slightly changed code as it would make this blog post to long. You can ether look at the GitHub links for that stuff or you can check out my earlier <a href="http://epsilon812.wordpress.com/2012/11/09/webvtt-0-3-release/">blog post</a>.
 
-I'll go over what I've done in the time since my last post:
+<p>Much of what I discussed in my last blog post has stayed the same with my final version of the 0.3 release. The major structure of the algorithm has stayed the same. However, I have made changes to some of the syntax in order to get rid of minor bugs. I won't re-post all that slightly changed code as it would make this blog post to long. You can ether look at the GitHub links for that stuff or you can check out my earlier <a href="/2012/11/09/webvtt-0-3-release.html">blog post</a>.</p>
 
-I've completed the UTF16 append functions:
+<p>I'll go over what I've done in the time since my last post:</p>
 
-[sourcecode language="cpp"]
+<p>I've completed the UTF16 append functions:</p>
+
+{% highlight c %}
 webvtt_status
 append_wchar_to_wchar( webvtt_wchar *append_to, webvtt_uint len, webvtt_wchar *to_append, webvtt_uint start, webvtt_uint stop )
 {
@@ -100,11 +82,11 @@ webvtt_string_append_string( webvtt_string *append_to, webvtt_string to_append )
 
 	return WEBVTT_SUCCESS;
 }
-[/sourcecode]
+{% endhighlight %}
 
-I've added in functions that compare two strings or two wchars:
+<p>I've added in functions that compare two strings or two wchars:</p>
 
-[sourcecode language="cpp"]
+{% highlight c %}
 webvtt_uint
 webvtt_compare_wchars( webvtt_wchar  *one, webvtt_uint one_len, webvtt_wchar *two, webvtt_uint two_len )
 {
@@ -136,11 +118,11 @@ webvtt_compare_strings( webvtt_string one, webvtt_string two )
 
 	return webvtt_compare_wchars( one-&gt;text, one-&gt;length, two-&gt;text, two-&gt;length );
 }
-[/sourcecode]
+{% endhighlight %}
 
-I've changed the webvtt_string_list struct and it's functions since the last blog post:
+<p>I've changed the webvtt_string_list struct and it's functions since the last blog post:</p>
 
-[sourcecode language="cpp"]
+{% highlight c %}
 struct
 webvtt_string_list_t
 {
@@ -200,45 +182,49 @@ webvtt_add_to_string_list( webvtt_string_list_ptr string_list_ptr, webvtt_string
 
 	return WEBVTT_SUCCESS;
 }
-[/sourcecode]
+{% endhighlight %}
 
-I've changed the WEBVTT_CALLBACK that will call the webvtt_parse_cuetext function:
+<p>I've changed the WEBVTT_CALLBACK that will call the webvtt_parse_cuetext function:</p>
 
-[sourcecode language="cpp"]
+{% highlight c %}
 static void WEBVTT_CALLBACK
 cue( void *userdata, webvtt_cue cue )
 {
 	webvtt_parse_cuetext( cue-&gt;payload-&gt;text, cue-&gt;node_head );
 }
-[/sourcecode]
+{% endhighlight %}
 
 Before it didn't call the parse cue text function and so the cue text wasn't parsed.
 
 I've changed the function signature for webvtt_parse_cuetext:
 
-[sourcecode language="cpp"]
+{% highlight c %}
 WEBVTT_EXPORT webvtt_status
 webvtt_parse_cuetext( webvtt_wchar *cue_text, webvtt_node_ptr node_ptr )
-[/sourcecode]
+{% endhighlight %}
 
-I've gotten rid of the webvtt_parser pointer, the line number, the length of *cue text, and the length of node_ptr in the function signature that was there previously.
+<p>I've gotten rid of the webvtt_parser pointer, the line number, the length of *cue text, and the length of node_ptr in the function signature that was there previously.</p>
+
 <ul>
 	<li>For the webvtt_parser pointer and line number I did this because there purpose was to be able to throw an error to the webvtt_parser pointer error call back and reference the line that it happened on, but currently the parser does not support this.</li>
 	<li>I got rid of the length of cue text because it should always be a null terminated pointer. So we can just tell that we are at the end of the line by checking for that. No need for the line length.</li>
 	<li>I got rid of the length of the node_ptr because the parser no longer returns an array of node_ptr it now returns a single node_ptr of type WEBVTT_HEAD_NODE, which contains an array of node_ptr underneath it.</li>
 </ul>
-I know we will be changing this in the future, but I got rid of it now to make it more clear.
 
-The other major thing that caitp and I were talking about on IRC last night was the data structure of the nodes. Before caitp had it set up that an internal node and a leaf node would contain a node and so they would be subclasses of node. Then you could just return an array of nodes and cast it to a particular type of node based on it's node kind.
+<p>I know we will be changing this in the future, but I got rid of it now to make it more clear.</p>
 
-The way I have it set up right now is similar but slightly different. In my version the node contains a pointer to a leaf node or internal node and based on its node kind you can cast it to either an internal node or a leaf node.
+<p>The other major thing that caitp and I were talking about on IRC last night was the data structure of the nodes. Before caitp had it set up that an internal node and a leaf node would contain a node and so they would be subclasses of node. Then you could just return an array of nodes and cast it to a particular type of node based on it's node kind.</p>
 
-caitp made the case for converting it back to the old format as it might be more readable and possibly take up less space in memory. This is something that we should probably discuss in the future.
+<p>The way I have it set up right now is similar but slightly different. In my version the node contains a pointer to a leaf node or internal node and based on its node kind you can cast it to either an internal node or a leaf node.</p>
 
-Some other things to note that we will need to take care of in the future:
+<p>caitp made the case for converting it back to the old format as it might be more readable and possibly take up less space in memory. This is something that we should probably discuss in the future.</p>
+
+<p>Some other things to note that we will need to take care of in the future:</p>
+
 <ul>
 	<li>I have not had the chance to test the parsing of escape characters, but the code for it is there.</li>
 	<li>It does not parse the new "lang" tag that was recently added to the W3C specification.</li>
 	<li>The memory operations in the node, token, and string list struct do not make use of the allocator functions that we have built into the framework.</li>
 </ul>
-Yupp, thats it. See ya.
+
+<p>Yupp, thats it. See ya.</p>

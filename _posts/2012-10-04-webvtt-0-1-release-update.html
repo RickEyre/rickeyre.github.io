@@ -2,48 +2,26 @@
 layout: post
 title: WebVTT 0.1 Release Update
 tags:
-- git
-- github
-- makefile
-- Open Source
-- python
-- Seneca College
-- software
-- technology
-- test spec
 - mozilla
-- w3c specification
-- webvtt
-- WEBVTT
+- seneca college
 - open-source
 status: publish
 type: post
 published: true
-meta:
-  _wpas_done_1604135: '1'
-  _wpas_done_1575533: '1'
-  _wpas_done_1604132: '1'
-  publicize_reach: a:3:{s:7:"twitter";a:1:{i:1604132;i:5;}s:2:"fb";a:1:{i:1575533;i:217;}s:2:"wp";a:1:{i:0;i:3;}}
-  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2012-10-04
-    15:47:31";}
-  _wpas_skip_1604135: '1'
-  _wpas_skip_1575533: '1'
-  _wpas_skip_1604132: '1'
-  _oembed_9c9309be27af5c24468d8fc21def4c9e: '{{unknown}}'
-  _oembed_2c173760e8655f9087d37dcea2a29e33: '{{unknown}}'
-  _oembed_eb4f9a5329844a8324ccce16f4f582ae: '{{unknown}}'
-  _oembed_f80b9dae158de82fd137ae2e7d91eb3c: '{{unknown}}'
 ---
-It has been about two weeks now since my class and I set out to start work on the <a href="http://epsilon812.wordpress.com/2012/09/18/a-new-project-webvtt/">0.1 release</a> of WebVTT for FireFox. We are now nearing our deadline and are in the final stages of peer reviewing each others work. You can check out that action on our main <a title="GitHub" href="https://github.com/humphd/webvtt/pull/15">GitHub</a> repository.
+<p>It has been about two weeks now since my class and I set out to start work on the <a href="/2012/09/18/a-new-project-webvtt.html">0.1 release</a> of WebVTT for FireFox. We are now nearing our deadline and are in the final stages of peer reviewing each others work. You can check out that action on our main <a title="GitHub" href="https://github.com/humphd/webvtt/pull/15">GitHub</a> repository.
 
-During the development of this 0.1 release I learnt a lot of things:
+<p>During the development of this 0.1 release I learnt a lot of things:
+
 <ul>
-	<li>How to dual boot a <a href="http://epsilon812.wordpress.com/2012/09/27/linux-install-finally/">linux</a> install properly</li>
-	<li>Continued to get better at using <a href="http://epsilon812.wordpress.com/2012/09/30/all-about-git/">GIT</a></li>
+	<li>How to dual boot a <a href="/2012/09/27/linux-install-finally.html">linux</a> install properly</li>
+	<li>Continued to get better at using <a href="/2012/09/30/all-about-git.html">GIT</a></li>
 	<li>Learnt the basics of <a href="http://www.python.org/">Python</a></li>
 	<li>Learnt about <a href="http://www.gnu.org/software/make/">Makefiles</a> and how ridiculously confusing they are</li>
 </ul>
-As we were developing the test suite for WebVTT, which will be the bulk of this 0.1 release, we had to address many different questions about the structure and standards we would be following:
+
+<p>As we were developing the test suite for WebVTT, which will be the bulk of this 0.1 release, we had to address many different questions about the structure and standards we would be following:
+
 <ul>
 	<li>What would the naming convention be for our test files?</li>
 	<li>What would the content of our test files look like?</li>
@@ -51,19 +29,23 @@ As we were developing the test suite for WebVTT, which will be the bulk of this 
 	<li>What would the Makefile need to build?</li>
 	<li>How would we keep the integrity of line endings in our test files as we would need to be testing LF, CR, and CRLF?</li>
 </ul>
-We eventually answered all of these questions leaving us with a pretty robust and clean test suite:
-<ol>
-	<li>Our Professor made a test harness written in Python that would take all the tests that we wrote and feed them through the Node.js WebVTT paraser module. This would give us a sanity check to confirm that the tests we write are good before we write our custom WebVTT parser in C++ for FireFox.</li>
-	<li>We added in a .gitattributes file that specifies not to convert line endings on our test files:
-[sourcecode language="html"]
+
+<p>We eventually answered all of these questions leaving us with a pretty robust and clean test suite:
+
+<p>Our Professor made a test harness written in Python that would take all the tests that we wrote and feed them through the Node.js WebVTT paraser module. This would give us a sanity check to confirm that the tests we write are good before we write our custom WebVTT parser in C++ for FireFox.</p>
+
+<p>We added in a .gitattributes file that specifies not to convert line endings on our test files:</p>
+
+{% highlight bash %}
 ./test/spec/good/*.test -text
 ./test/spec/bad/*.test -text
 ./test/spec/known-good/*.test -text
 ./test/spec/known-bad/*.test -text
-[/sourcecode]
-</li>
-	<li>We decided to document all our tests on our <a href="http://zenit.senecac.on.ca/wiki/index.php/0.1_Release_2012_WebVTT_Test_Suite">wiki</a> and standardize the naming of our tests using the format of<em> tc###-short_information_block_here.test</em>. You can see our wiki page on the naming convention <a href="http://zenit.senecac.on.ca/wiki/index.php/Test_files">here</a>. We also decided to create a custom .test file format that would contain two parts, a comment section at the top and a WebVTT section at the bottom. Here is one of the .test files that I wrote:
-[sourcecode language="html"]
+{% endhighlight %}
+
+<p>We decided to document all our tests on our <a href="http://zenit.senecac.on.ca/wiki/index.php/0.1_Release_2012_WebVTT_Test_Suite">wiki</a> and standardize the naming of our tests using the format of<em> tc###-short_information_block_here.test</em>. You can see our wiki page on the naming convention <a href="http://zenit.senecac.on.ca/wiki/index.php/Test_files">here</a>. We also decided to create a custom .test file format that would contain two parts, a comment section at the top and a WebVTT section at the bottom. Here is one of the .test files that I wrote:</p>
+
+{% highlight bash %}
 /*
 This tests to make sure that a Cue Component class can be resolved with the [cue component].[subclass] notation. 
 This test should pass.
@@ -75,10 +57,13 @@ WEBVTT
 
 00:11.000 --&amp;gt; 00:13.000
 &amp;lt;u.class.subclass&amp;gt;Hey this is a test!
-[/sourcecode]
-We decided on this format as it allowed us to keep the metadata right with the test. Putting it directly in the test file will make it easier to work with in the future as you won't have to refer back to another document to find the metadata of the test file.</li>
-	<li>Now that we had a custom .test file we needed to parse it before we ran it through the Node module in order to rip out the WebVTT section. In order to address this issue I wrote a custom test file <a href="http://goo.gl/bujka">parser</a> in Python and changed the Makefile to run it before running the test harness. We were running this configuration for a while when my Professor told me that rather than the Python script looping through the .test directories and ripping the WebVTT, the Makefile should determine what tests files need to be ripped and call the Python script for each individual test file. In accordance with this I spent a lot of time working with our Makefile trying to figure out how to get it to run the way that we wanted it too. Through this I learnt a lot about Makefiles (I will do a blog post later to talk about this in detail) and after much struggle, and with the help of one of my <a href="http://caitpotter.blogspot.ca/">class mates</a> as well as my <a href="http://vocamus.net/dave/">Professor</a>, we got it <a href="https://github.com/RickEyre/webvtt/blob/5d4295a204084b59aaeb50a5f424b80daea2b1ce/Makefile">working</a>. In order to implement this correctly we had to add a few lines to the Makefile:
-[sourcecode language="html"]
+{% endhighlight %}
+
+<p>We decided on this format as it allowed us to keep the metadata right with the test. Putting it directly in the test file will make it easier to work with in the future as you won't have to refer back to another document to find the metadata of the test file.</p>
+
+<p>Now that we had a custom .test file we needed to parse it before we ran it through the Node module in order to rip out the WebVTT section. In order to address this issue I wrote a custom test file <a href="http://goo.gl/bujka">parser</a> in Python and changed the Makefile to run it before running the test harness. We were running this configuration for a while when my Professor told me that rather than the Python script looping through the .test directories and ripping the WebVTT, the Makefile should determine what tests files need to be ripped and call the Python script for each individual test file. In accordance with this I spent a lot of time working with our Makefile trying to figure out how to get it to run the way that we wanted it too. Through this I learnt a lot about Makefiles (I will do a blog post later to talk about this in detail) and after much struggle, and with the help of one of my <a href="http://caitpotter.blogspot.ca/">class mates</a> as well as my <a href="http://vocamus.net/dave/">Professor</a>, we got it <a href="https://github.com/RickEyre/webvtt/blob/5d4295a204084b59aaeb50a5f424b80daea2b1ce/Makefile">working</a>. In order to implement this correctly we had to add a few lines to the Makefile:</p>
+
+{% highlight bash %}
 SRC_DIR = .
 TEST_DIR = $(SRC_DIR)/test
 SPEC_DIR = $(TEST_DIR)/spec
@@ -99,7 +84,10 @@ check-js: objdir $(VTT_SRC)
 
 $(OBJ_DIR)/%.vtt : $(SRC_DIR)/%.test
 	@$(PYTHON) $(STIP_VTT) $&amp;lt; $@
-[/sourcecode]
-Now when we run the command 'make check-js' (check-js denotes that we want the Node.js WebVTT module to run) the Makefile will make the object directory, where the ripped .vtt files will live, call the script to rip the WebVTT out of the test files that have changed since the last build, and then run the test harness.This is much cleaner than the first solution where the Python script to rip the WebVTT just ripped every .test file each time it ran without checking if it actually needed to rip it.</li>
+{% endhighlight %}
+
+<p>Now when we run the command 'make check-js' (check-js denotes that we want the Node.js WebVTT module to run) the Makefile will make the object directory, where the ripped .vtt files will live, call the script to rip the WebVTT out of the test files that have changed since the last build, and then run the test harness.This is much cleaner than the first solution where the Python script to rip the WebVTT just ripped every .test file each time it ran without checking if it actually needed to rip it.</li></p>
+
 </ol>
-Hopefully, we will be able to get through our peer reviews soon and get started on our next release, where I hope we will begin working on the actual parser and hook for FireFox.
+
+<p>Hopefully, we will be able to get through our peer reviews soon and get started on our next release, where I hope we will begin working on the actual parser and hook for FireFox.</p>

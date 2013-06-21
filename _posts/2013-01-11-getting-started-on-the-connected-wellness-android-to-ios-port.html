@@ -2,39 +2,15 @@
 layout: post
 title: Getting Started on the Connected Wellness Android to iOS Port
 tags:
-- apache cordova
-- apple
-- bluetooth
-- CDOT
 - cdot
-- Connected Wellness
-- cordova
-- ios
-- mercurial
-- NexJ
-- nexj
-- Open Source
-- Seneca College
-- software
-- software-development
-- technology
 - open-source
+- seneca college
 status: publish
 type: post
 published: true
-meta:
-  _publicize_pending: '1'
-  _wpas_done_1575533: '1'
-  publicize_twitter_user: epsilon812
-  _publicize_done_external: a:1:{s:8:"facebook";a:1:{i:503100574;b:1;}}
-  _wpas_done_1604132: '1'
-  _wpas_done_1604135: '1'
-  publicize_reach: a:3:{s:7:"twitter";a:1:{i:1604132;i:22;}s:2:"fb";a:1:{i:1575533;i:218;}s:2:"wp";a:1:{i:0;i:8;}}
-  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2013-01-11
-    17:08:15";}
 ---
-So I've started a new job here at <a href="http://zenit.senecac.on.ca/wiki/index.php/Main_Page">CDOT</a> (Seneca's Centre for Development of Open Technology) and the first project that I've been assigned to work on is a project called Connected Wellness that is being done in collaboration with <a href="http://www.nexj.com/">NexJ</a> and other colleges. I'm on a team of three who will be porting the current android Bluetooth plugin over to iOS. I will be blogging a lot about this in the next two months since the deadline for it to be done is the end of February.
+<p>So I've started a new job here at <a href="http://zenit.senecac.on.ca/wiki/index.php/Main_Page">CDOT</a> (Seneca's Centre for Development of Open Technology) and the first project that I've been assigned to work on is a project called Connected Wellness that is being done in collaboration with <a href="http://www.nexj.com/">NexJ</a> and other colleges. I'm on a team of three who will be porting the current android Bluetooth plugin over to iOS. I will be blogging a lot about this in the next two months since the deadline for it to be done is the end of February.</p>
 
-What I've been doing so far is setting up my development environment and getting acquainted with <a href="http://mercurial.selenic.com/">Mercurial</a> which I have never used before. I've started work on the MedicalDevicePlugin class which will be the entry point for Apache Cordova to the plugin. I've also ported over the basic outline for the Command interface and inheritance structure in order for me to be able to reference them in the MedicalDevicePlugin class. Everything for my part looks like smooth sailing so far. The only thing I'm worried about is getting the Cordova library to work properly in iOS.
+<p>What I've been doing so far is setting up my development environment and getting acquainted with <a href="http://mercurial.selenic.com/">Mercurial</a> which I have never used before. I've started work on the MedicalDevicePlugin class which will be the entry point for Apache Cordova to the plugin. I've also ported over the basic outline for the Command interface and inheritance structure in order for me to be able to reference them in the MedicalDevicePlugin class. Everything for my part looks like smooth sailing so far. The only thing I'm worried about is getting the Cordova library to work properly in iOS.</p>
 
-My teammate, Caitlin, has recently <a href="http://caitpotter.blogspot.ca/search/label/cdot">blogged</a> about troubles with the current libraries we are using for the Bluetooth protocol not supporting the specific devices we want to interface with. Hopefully, we will be able to work around this. My first thought is to use an open source Bluetooth library for iOS, that is if Apple even lets outside frameworks access the Bluetooth hardware directly in some way.
+<p>My teammate, Caitlin, has recently <a href="http://caitpotter.blogspot.ca/search/label/cdot">blogged</a> about troubles with the current libraries we are using for the Bluetooth protocol not supporting the specific devices we want to interface with. Hopefully, we will be able to work around this. My first thought is to use an open source Bluetooth library for iOS, that is if Apple even lets outside frameworks access the Bluetooth hardware directly in some way.</p>

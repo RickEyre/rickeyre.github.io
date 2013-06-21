@@ -2,57 +2,39 @@
 layout: post
 title: WebVTT 0.3 Release
 tags:
-- c parser
-- firefox
-- javascript test
-- mozilla
-- Open Source
-- Seneca College
 - seneca college
-- software
-- software-development
-- technology
-- w3c specification
-- webvtt
-- WEBVTT
+- mozilla
 - open-source
 status: publish
 type: post
 published: true
-meta:
-  _wpas_done_1604135: '1'
-  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2012-11-09
-    23:01:48";}
-  _wpas_done_1575533: '1'
-  _publicize_done_external: a:1:{s:8:"facebook";a:1:{i:503100574;b:1;}}
-  publicize_twitter_user: epsilon812
-  _wpas_done_1604132: '1'
-  publicize_reach: a:3:{s:7:"twitter";a:1:{i:1604132;i:5;}s:2:"fb";a:1:{i:1575533;i:216;}s:2:"wp";a:1:{i:0;i:7;}}
 ---
-So it's been a while since I posted and in that intervening time we have been hard at work on the 0.3 release of our parser.
+<p>So it's been a while since I posted and in that intervening time we have been hard at work on the 0.3 release of our parser.</p>
 
-For this release we are concentrating on mainly getting a full *working parser* out as well as getting our build system up to par with a unit testing strategy as well as making the parser be able to work across all platforms i.e. OS X, Linux, and Windows.
+<p>For this release we are concentrating on mainly getting a full *working parser* out as well as getting our build system up to par with a unit testing strategy as well as making the parser be able to work across all platforms i.e. OS X, Linux, and Windows.</p>
 
-For our Unit testing we are going with a Node-ffi solution. Node-ffi will allow us to dynamically bind our C library into a Javascript Test Suite within which we can easily do unit tests. If you want to read up more about that you can check out my classmate <a href="http://dale.io/2012/11/04/webvtt-03-node-ffi.html">Dales </a>blog who has volunteered to work on that.
+<p>For our Unit testing we are going with a Node-ffi solution. Node-ffi will allow us to dynamically bind our C library into a Javascript Test Suite within which we can easily do unit tests. If you want to read up more about that you can check out my classmate <a href="http://dale.io/2012/11/04/webvtt-03-node-ffi.html">Dales </a>blog who has volunteered to work on that.</p>
 
-For our build system we are using <a href="http://en.wikipedia.org/wiki/GNU_build_system">Autotools</a> which is a build system from GNU that is designed to assist in making cross platform build systems. You can check out my classmate <a href="http://caitpotter.blogspot.ca/2012/11/autotools-are-difficult.html">Caitlins </a>blog to read more about that.
+<p>For our build system we are using <a href="http://en.wikipedia.org/wiki/GNU_build_system">Autotools</a> which is a build system from GNU that is designed to assist in making cross platform build systems. You can check out my classmate <a href="http://caitpotter.blogspot.ca/2012/11/autotools-are-difficult.html">Caitlins </a>blog to read more about that.</p>
 
-I myself have been working more on the C parser. We chose to go with Caitlins version of the parser to go forward with when my class met to discuss our 0.2 release. This is related to the 'build two and plan to throw one away' idea that I talked about in my previous blog posts.
+<p>I myself have been working more on the C parser. We chose to go with Caitlins version of the parser to go forward with when my class met to discuss our 0.2 release. This is related to the 'build two and plan to throw one away' idea that I talked about in my previous blog posts.</p>
 
-I've been implementing the cue text parser portion of the C parser. This is the part that parses the payload of a WebVTT text track i.e. the actual text and markup that will be rendered on screen. Going down this road has also led me to work on a couple other parts of the C parser such as:
+<p>I've been implementing the cue text parser portion of the C parser. This is the part that parses the payload of a WebVTT text track i.e. the actual text and markup that will be rendered on screen. Going down this road has also led me to work on a couple other parts of the C parser such as:</p>
+
 <ul>
 	<li>Creating some utility functions to check whether or not a UTF16 character is a digit or an alphanumeric character respectively</li>
 	<li>Harnessing our other string code which Caitlin originally worked on to be able to append UTF16 strings together</li>
 	<li>Normalizing some of the function names in our C parser which Caitlin worked on. These have to do with changing function names from webvtt_x_delete or create to webvtt_delete_x. Not that hard.</li>
 	<li>We also discussed what character encoding to use internally in our parser. We decided on UTF16 as that gives some benefits such as it being the encoding that is used on the web as well as it being a simple encoding to use unlike UTF8. I will probably be working on getting the parser to use UTF16 strings after I finished the cue text parser.</li>
 </ul>
-I'll briefly go over the code I have done so far.
 
-<strong>Cue Text Parser</strong>
+<p>I'll briefly go over the code I have done so far.</p>
 
-For the cue text parser I followed the algorithm provided by the <a href="http://dev.w3.org/html5/webvtt/#webvtt-cue-text-parsing-rules">W3C specification</a> very closely. Here is the main parsing method:
+<h3>Cue Text Parser</h3>
 
-[sourcecode language="cpp"]
+<p>For the cue text parser I followed the algorithm provided by the <a href="http://dev.w3.org/html5/webvtt/#webvtt-cue-text-parsing-rules">W3C specification</a> very closely. Here is the main parsing method:</p>
+
+{% highlight c %}
 /**
  * Currently line and len are not being kept track of.
  * Don't think pnode_length is needed as nodes track there list count internally.
@@ -124,15 +106,15 @@ webvtt_parse_cuetext( webvtt_parser self, webvtt_uint line, const webvtt_wchar *
 
 	return WEBVTT_SUCCESS;
 }
-[/sourcecode]
+{% endhighlight %}
 
-In short - it loops, calling the tokenizer function until it has reached the end of the buffer. Based on the status returned by the tokenizer it will either emit an error (not added yet) or it will add a node to the node list depending on what kind of token is returned.
+<p>In short - it loops, calling the tokenizer function until it has reached the end of the buffer. Based on the status returned by the tokenizer it will either emit an error (not added yet) or it will add a node to the node list depending on what kind of token is returned.</p>
 
-You can see in the code that I have created many utility functions that do things such as creating a node from a token and creating or deleting nodes or tokens. I won't list those functions here because it would be too much.
+<p>You can see in the code that I have created many utility functions that do things such as creating a node from a token and creating or deleting nodes or tokens. I won't list those functions here because it would be too much.</p>
 
-The other main bulk of this parser is the actual tokenizer:
+<p>The other main bulk of this parser is the actual tokenizer:</p>
 
-[sourcecode language="cpp"]
+{% highlight c %}
 webvtt_status
 webvtt_cue_text_tokenizer( webvtt_wchar_ptr position_ptr, webvtt_cue_text_token_ptr token_ptr )
 {
@@ -219,13 +201,13 @@ webvtt_cue_text_tokenizer( webvtt_wchar_ptr position_ptr, webvtt_cue_text_token_
 
 	return WEBVTT_SUCCESS;
 }
-[/sourcecode]
+{% endhighlight %}
 
-This function takes the byte stream and interprets it into tokens that the parser will be able to understand. One of the main departures that I made away from the W3C specification is that I've farmed each tokenizer state out to a function and therefore I had to change a tiny bit of the logic i.e. instead of using only a result and a buffer to parse the text I have created separate webvtt_strings that can handle each one of the result, buffer, and annotation. This simplifies the code as you don't have to pass back and forth only two parameters between everyone of these functions to keep track of the parsed output. I also created a webvtt_string_list struct that will be able to handle a list of strings for the classes of a start tag in the cue text.
+<p>This function takes the byte stream and interprets it into tokens that the parser will be able to understand. One of the main departures that I made away from the W3C specification is that I've farmed each tokenizer state out to a function and therefore I had to change a tiny bit of the logic i.e. instead of using only a result and a buffer to parse the text I have created separate webvtt_strings that can handle each one of the result, buffer, and annotation. This simplifies the code as you don't have to pass back and forth only two parameters between everyone of these functions to keep track of the parsed output. I also created a webvtt_string_list struct that will be able to handle a list of strings for the classes of a start tag in the cue text.</p>
 
-Here is an example of one of the functions that parses a tokenizer state:
+<p>Here is an example of one of the functions that parses a tokenizer state:</p>
 
-[sourcecode language="cpp"]
+{% highlight c %}
 webvtt_status
 webvtt_cue_text_tokenizer_start_tag_class_state( webvtt_wchar_ptr position_ptr,
 	webvtt_cue_text_token_state_ptr token_state_ptr, webvtt_string_list css_classes )
@@ -265,19 +247,19 @@ webvtt_cue_text_tokenizer_start_tag_class_state( webvtt_wchar_ptr position_ptr,
 	webvtt_delete_string( buffer );
 	return WEBVTT_UNFINISHED;
 }
-[/sourcecode]
+{% endhighlight %}
 
-Each one of the tokenizer state functions loops until either it changes the state of the tokenizer, which means it needs to start parsing it in another one of the tokenizer state functions, or it reaches a 'termination' point i.e. a point where either a valid token has been parsed or where it has come across the end of the byte stream prematurely.
+<p>Each one of the tokenizer state functions loops until either it changes the state of the tokenizer, which means it needs to start parsing it in another one of the tokenizer state functions, or it reaches a 'termination' point i.e. a point where either a valid token has been parsed or where it has come across the end of the byte stream prematurely.</p>
 
-CHECK_MEMORY_OP is just a macro that takes the returned webvtt_status and compares it to see if it was a success. If it was not then it returns the status that the memory operation returned. One problem that I have here is that since it returns immediately there is no place to deallocate memory that may have been allocated in the function. Should be easy to fix but I haven't gotten around to it yet.
+<p>CHECK_MEMORY_OP is just a macro that takes the returned webvtt_status and compares it to see if it was a success. If it was not then it returns the status that the memory operation returned. One problem that I have here is that since it returns immediately there is no place to deallocate memory that may have been allocated in the function. Should be easy to fix but I haven't gotten around to it yet.</p>
 
-<strong>UTF16 String Manipulations</strong>
+<h3>UTF16 String Manipulations</h3>
 
-I haven't completed some of the functions that I call in the parser code for UTF16 strings such as the functions that handle appending webvtt_wchars or webvtt_strings to webvtt_strings, but I will be working on that next. I also need to implement a function that will hopefully take a string literal and append it to a webvtt_string.
+<p>I haven't completed some of the functions that I call in the parser code for UTF16 strings such as the functions that handle appending webvtt_wchars or webvtt_strings to webvtt_strings, but I will be working on that next. I also need to implement a function that will hopefully take a string literal and append it to a webvtt_string.</p>
 
-The functions for webvtt_strings that I have working so far are the is_digit, is_alphanumeric, and add to webvtt_string_list functions,:
+<p>The functions for webvtt_strings that I have working so far are the is_digit, is_alphanumeric, and add to webvtt_string_list functions,:</p>
 
-[sourcecode language="cpp"]
+{% highlight c %}
 webvtt_status
 webvtt_add_to_string_list( webvtt_string_list string_list, webvtt_string string )
 {
@@ -322,8 +304,8 @@ webvtt_is_digit( webvtt_wchar character )
 {
 	return character &gt;= UTF16_DIGIT_ZERO &amp;&amp; character &lt;= UTF16_DIGIT_NINE;
 }
-[/sourcecode]
+{% endhighlight %}
 
-One final thing that I want to mention is that all this code is completely untested so far. Once I get the webvtt_string functions in place I will start to debug and test it. If you want to check out the entire code that I've been working on you can see that <a href="https://github.com/RickEyre/webvtt/tree/cue-text-parser">here</a>. The main places you can look in are <a href="https://github.com/RickEyre/webvtt/blob/cue-text-parser/src/libwebvtt/cuetext.c">cuetext</a>, <a href="https://github.com/RickEyre/webvtt/blob/cue-text-parser/src/libwebvtt/cue.c">cue</a>, and <a href="https://github.com/RickEyre/webvtt/blob/cue-text-parser/src/libwebvtt/string.c">string</a>. Our 0.3 release is due this Thursday coming up. I'm aiming to have this cue text parser done along with the change over to use of UTF16 everywhere in the parser, as well as converting my old tests from the 0.1 release to Unit Tests using the new Node-ffi Javascript test suite.
+<p>One final thing that I want to mention is that all this code is completely untested so far. Once I get the webvtt_string functions in place I will start to debug and test it. If you want to check out the entire code that I've been working on you can see that <a href="https://github.com/RickEyre/webvtt/tree/cue-text-parser">here</a>. The main places you can look in are <a href="https://github.com/RickEyre/webvtt/blob/cue-text-parser/src/libwebvtt/cuetext.c">cuetext</a>, <a href="https://github.com/RickEyre/webvtt/blob/cue-text-parser/src/libwebvtt/cue.c">cue</a>, and <a href="https://github.com/RickEyre/webvtt/blob/cue-text-parser/src/libwebvtt/string.c">string</a>. Our 0.3 release is due this Thursday coming up. I'm aiming to have this cue text parser done along with the change over to use of UTF16 everywhere in the parser, as well as converting my old tests from the 0.1 release to Unit Tests using the new Node-ffi Javascript test suite.</p>
 
-Later!
+<p>Later!</p>

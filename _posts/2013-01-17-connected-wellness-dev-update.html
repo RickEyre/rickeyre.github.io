@@ -2,41 +2,14 @@
 layout: post
 title: Connected Wellness Dev Update
 tags:
-- apple
-- bluetooth
-- CDOT
 - cdot
-- Connected Wellness
-- connected wellness
-- ios
-- java
-- NexJ
-- nexj
-- objective-c
-- Open Source
-- seneca
-- Seneca College
-- seneca college
-- software
-- software-development
-- technology
 - open-source
 status: publish
 type: post
 published: true
-meta:
-  _publicize_pending: '1'
-  publicize_reach: a:2:{s:7:"twitter";a:1:{i:1604132;i:24;}s:2:"wp";a:1:{i:0;i:8;}}
-  publicize_twitter_user: epsilon812
-  _wpas_done_1604132: '1'
-  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:384903786;b:1;}}
-  _wpas_done_1604135: '1'
-  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2013-01-17
-    19:31:41";}
-  _wpas_skip_1604132: '1'
-  _wpas_skip_1604135: '1'
 ---
-We've gotten a lot done in the last week for the iOS port of the Bluetooth Plugin. You can check out my work <a href="https://bitbucket.org/RichardEyre/mobile-bluetooth-adapters">here</a>.
+<p>We've gotten a lot done in the last week for the iOS port of the Bluetooth Plugin. You can check out my work <a href="https://bitbucket.org/RichardEyre/mobile-bluetooth-adapters">here</a>.</p>
+
 <ul>
 	<li>I've finished the MedicalDevicePlugin class.</li>
 	<li>Wrote the Command Protocol.</li>
@@ -45,19 +18,24 @@ We've gotten a lot done in the last week for the iOS port of the Bluetooth Plugi
 	<li>I also wrote the Invoker class but left out the bulk of the implementation as it uses the WorkQueue, so there is no point to code it for now as I don't know what kind of design we will be using.</li>
 	<li>I've also pushed a lot of bug fixes to the repo.</li>
 </ul>
-<h2>Objective-c vs. Java</h2>
-There were a lot of changes going to iOS from Android. The biggest one was that a lot of the architecture and functions of the Cordova Library in iOS are different than in Android. They still follow the same idea, but are different in implementation. Most of the functions in Android have an iOS equivalent. One of the ones that do not is onActivityResult() in the DevicePlugin implementation. I've talked with Carl about this though and it seems that it won't be that big of a deal since we are planning to remove that function in the future. It seems to me that the Cordova Library for Objective-c is a lot more immature then the Java one. You can see this in the fact that going from version 2.0 (the one that we are using) to 2.3, most of the Objective-c code changes, but almost nothing from the Java code does. This indicates that there is still a lot of work to be done on the Objective-c library. I'm not complaining, but the Java Cordova Library just looks so much nicer.
 
-Another thing that is a lot different are language specific things. For example in Objective-c you cannot specify the visibility level (i.e. public, protected, private) on member functions, and you can't specify static member variables in exactly the same way as Java. This isn't a big deal, but it is one of the many things that must change from going to Java to iOS. Another, rather concerning, thing that is different is that Objective-c offers no way to synchronize entire functions. This is a problem because this design paradigm is used a lot in the Java plugin. We will have to find a way around it in Objective-c.
-<h2>Other Work<strong>
-</strong></h2>
+<h2>Objective-c vs. Java</h2>
+
+<p>There were a lot of changes going to iOS from Android. The biggest one was that a lot of the architecture and functions of the Cordova Library in iOS are different than in Android. They still follow the same idea, but are different in implementation. Most of the functions in Android have an iOS equivalent. One of the ones that do not is onActivityResult() in the DevicePlugin implementation. I've talked with Carl about this though and it seems that it won't be that big of a deal since we are planning to remove that function in the future. It seems to me that the Cordova Library for Objective-c is a lot more immature then the Java one. You can see this in the fact that going from version 2.0 (the one that we are using) to 2.3, most of the Objective-c code changes, but almost nothing from the Java code does. This indicates that there is still a lot of work to be done on the Objective-c library. I'm not complaining, but the Java Cordova Library just looks so much nicer.</p>
+
+<p>Another thing that is a lot different are language specific things. For example in Objective-c you cannot specify the visibility level (i.e. public, protected, private) on member functions, and you can't specify static member variables in exactly the same way as Java. This isn't a big deal, but it is one of the many things that must change from going to Java to iOS. Another, rather concerning, thing that is different is that Objective-c offers no way to synchronize entire functions. This is a problem because this design paradigm is used a lot in the Java plugin. We will have to find a way around it in Objective-c.</p>
+
+<h2>Other Work</h2>
+
 <ul>
 	<li>Caitlin has currently been tackling the BluetoothServer class as well as doing the full implementation of the ReturnableCommand class.</li>
 	<li>Vince has been working on the PacketParser implementation. I haven't heard much from him this week, but I hope he has been making good progress.</li>
 </ul>
+
 <h2>Moving Forward</h2>
-After Caitlin gets the ReturnableCommand landed we will be able to start implementing the concrete Command objects that inherit from ReturnableCommand and begin to tie the commands into the Invoker as well as the MedicalDevicePlugin class. I've taken on writing the isSupported(), isEnabled(), and isDisabled() commands. Everything is looking good so far baring the problem we may have with the Bluetooth Protocols...
+
+<p>After Caitlin gets the ReturnableCommand landed we will be able to start implementing the concrete Command objects that inherit from ReturnableCommand and begin to tie the commands into the Invoker as well as the MedicalDevicePlugin class. I've taken on writing the isSupported(), isEnabled(), and isDisabled() commands. Everything is looking good so far baring the problem we may have with the Bluetooth Protocols...</p>
 
 <strong>Edit:</strong>
 
-<strong></strong>Recently heard from Carl that I should be implementing threads in Objective-c in the Invoker class. It's up to me how we get that done. So I will be working on that before continuing the Command implementations.
+<p>Recently heard from Carl that I should be implementing threads in Objective-c in the Invoker class. It's up to me how we get that done. So I will be working on that before continuing the Command implementations.</p>

@@ -4,6 +4,8 @@ title: 'WEBVTT: Unit tests, unit tests...'
 tags:
 - mozilla
 - open-source
+- cdot
+- seneca college
 status: publish
 type: post
 published: true
@@ -12,7 +14,7 @@ published: true
 
 <p>TLDR: I made some progress on the Gecko code for the WEBVTT parser integration, but was unable to finish because I was moved over to finishing the WEBVTT parser exclusively as we needed to move fast on it. This resulted in unit test fixing galore.</p>
 
-<h2>Gecko Integration</h2>
+<h3>Gecko Integration</h3>
 
 <p>I was working on the Gecko integration stuffyo before I got pulled away and made some decent progress on that. I got some feedback on my first WIP and I addressed most of the issues that the reviewers pointed out. A lot of it was minor nits like code style or incorrect code that I just needed to remove. However, there were a few big things:</p>
 
@@ -23,11 +25,11 @@ published: true
 
 <p>The other couple of things I did before I submitted my last WIP for feeback was fleshing out a lot of the <a href="https://github.com/RickEyre/mozilla-central/blob/webvtt-load-listener/content/html/content/src/WebVTTLoadListener.cpp#L235">code</a> that will convert the c structs from the c parser to DOM elements, getting the <a href="https://github.com/RickEyre/mozilla-central/blob/webvtt-load-listener/content/html/content/src/WebVTTLoadListener.cpp#L210">code</a> that deals with DocumentFragments working correctly, and a few other minor things. You can check out the full WIP that I submitted for my last review <a href="https://bug833382.bugzilla.mozilla.org/attachment.cgi?id=714577">here</a>.
 
-<h2>Driving Issues</h2>
+<h3>Driving Issues</h3>
 
 <p>The other thing that I was really trying to do up until this point, and currently, is drive the issue list. I've noticed that the issue list tends to stagnate if no one is there monitoring it. To this point I have been looking over the issue list, about once every other day, and closing issues that need to be closed, i.e. onces that have been resolved, seem to be going nowhere, or seem to have gone as far as they are able to, as well as trying to push issues that seem to have stalled by @ mentioning the parties involved, or asking a question about where we should head in light of the issue. This process has been very helpful because it has enabled us to keep our issue list from being cluttered by issues that are no longer needed and to also drive issues that people might have forgotten about.</p>
 
-<h2>Parser Unit Test Debugging</h2>
+<h3>Parser Unit Test Debugging</h3>
 
 <p>About three weeks into working on the Gecko integration as well as the parser  I was asked to step back from the Gecko integration for a while and to start working exclusively on getting the parser to pass all the unit tests. To that end, I relinquished my duties on the Gecko integration for a bit. My first job was to help Caitlin get her massive patch split up and landed. To do this she asked me to write a <a href="https://github.com/mozilla/webvtt/pull/176">finish parsing</a> function that would allow the patch to be split up more easily. After that was done I started to work on the payload unit tests, as I anticipated Caitlin's cue code to be landing soon. I was able to get around 90 % of the payload unit tests working over reading week, valgrind and all, and solve many bugs in the parser. A lot of the bugs that were effecting the payload tests were also effecting the cue tests, so I was able to hit two birds with one stone in many cases.</p>
 
@@ -51,7 +53,7 @@ published: true
 
 <p>If you'd like to check out the work I've been doing for the past couple of weeks you can look at my list of <a href="https://github.com/mozilla/webvtt/pulls/RickEyre?direction=desc&amp;page=1&amp;sort=created&amp;state=closed">pull requests</a>.</p>
 
-<h2>Next Week</h2>
+<h3>Next Week</h3>
 
 <p>Next week, March 14, we will be travelling to the Mozilla Toronto Office for our class. Our Professor, <a href="http://vocamus.net/dave/">Dave Humphrey</a>, wants us to have a demo and presentation ready to show the devs at Mozilla. So we will be sprinting on getting the last pieces of the puzzle for the WEBVTT integration locked in. This is mostly the integration code that I had to leave off on last week. I'm going to be getting a lot of help this time for that so hopefully we will get it done.</p>
 

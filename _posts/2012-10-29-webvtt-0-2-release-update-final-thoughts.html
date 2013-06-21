@@ -2,84 +2,63 @@
 layout: post
 title: WebVTT 0.2 Release Update - Final Thoughts
 tags:
-- c
-- firefox
 - mozilla
-- Open Source
-- parser
-- seneca
-- Seneca College
-- software
-- software-development
-- technology
-- w3c specification
-- webvtt
-- WEBVTT
+- seneca college
 - open-source
 status: publish
 type: post
 published: true
-meta:
-  _wpas_done_1604135: '1'
-  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2012-10-29
-    19:54:36";}
-  _wpas_done_1575533: '1'
-  _publicize_done_external: a:1:{s:8:"facebook";a:1:{i:503100574;b:1;}}
-  publicize_twitter_user: epsilon812
-  _wpas_done_1604132: '1'
-  publicize_reach: a:3:{s:7:"twitter";a:1:{i:1604132;i:5;}s:2:"fb";a:1:{i:1575533;i:215;}s:2:"wp";a:1:{i:0;i:7;}}
-  _wpas_skip_1575533: '1'
-  _wpas_skip_1604132: '1'
-  _wpas_skip_1604135: '1'
 ---
-So we're on the final day before our 0.2 release for WebVTT is due and my teams C parser is yet to be completed. Hopefully, my partner and I can finish off things later tonight and we can get it finished off for tomorrow. However, if we don't get it completed not all is lost. The primary goal of this release was to learn about the WebVTT parser by having three separate teams work on coding three different parsers. The idea here was to follow the design principle "Build two and plan to throw one away". Judged under those goals I believe my team has met them. We have learnt much about what we will need to do in order to make a good parser and much about how we should go about doing that. I'll go through the most crucial things that I believe we need to get right to have a final parser that is good.
+<p>So we're on the final day before our 0.2 release for WebVTT is due and my teams C parser is yet to be completed. Hopefully, my partner and I can finish off things later tonight and we can get it finished off for tomorrow. However, if we don't get it completed not all is lost. The primary goal of this release was to learn about the WebVTT parser by having three separate teams work on coding three different parsers. The idea here was to follow the design principle "Build two and plan to throw one away". Judged under those goals I believe my team has met them. We have learnt much about what we will need to do in order to make a good parser and much about how we should go about doing that. I'll go through the most crucial things that I believe we need to get right to have a final parser that is good.</p>
 
-<strong>Error <strong>Handling and Parser Ignore Logging</strong></strong>
+<h3>Error Handling and Parser Ignore Logging</h3>
 
-We need a good design for error handling and ignore logging. Both of them represent similar ideas and similar implementations but have but have different end meanings. Errors are those things which cause the parser to completely break, whereas parser ignore logging is when the parser encounters malformed WebVTT text in the WebVTT byte stream. We want to log all of these ignores and errors and have a way to hook into ignore logger so that we can test properly. The Prof brought up the fact that a lot of the tests where we would expect an ignore will actually be Unit Tests, so that will simplify things a bit.
+<p>We need a good design for error handling and ignore logging. Both of them represent similar ideas and similar implementations but have but have different end meanings. Errors are those things which cause the parser to completely break, whereas parser ignore logging is when the parser encounters malformed WebVTT text in the WebVTT byte stream. We want to log all of these ignores and errors and have a way to hook into ignore logger so that we can test properly. The Prof brought up the fact that a lot of the tests where we would expect an ignore will actually be Unit Tests, so that will simplify things a bit.</p>
 
-<strong>Efficient Way of Loading and Working With Lines of Text</strong>
+<h3>Efficient Way of Loading and Working With Lines of Text</h3>
 
-By far the most annoying thing that we had to deal with during this initial parser development was figuring out how to load and work with lines efficiently while retaining a link to the context of the byte stream.
+<p>By far the most annoying thing that we had to deal with during this initial parser development was figuring out how to load and work with lines efficiently while retaining a link to the context of the byte stream.</p>
 
-The parser asks you to work with text in a couple different ways.
+<p>The parser asks you to work with text in a couple different ways.</p>
+
 <ul>
 	<li>Read an entire line of text and compare a multi-character value to the string</li>
 	<li>Split text on spaces and work with those split strings</li>
 	<li>Loop through char by char and compare values</li>
 </ul>
-All of these things seem pretty simple but what makes it complicated is that we want to be able to use all these different methods while retaining a link to the actual position of what character we are on in the byte stream. This way when we ignore some cue text we can tell exactly where it ignored that cue text and spit that out into a logger. That means that we can't be creating separate string, or pointers, that are completely decoupled from the byte stream, because we will lose the ability to see where it ignored cue text.
 
-One thing to think about is whether or not loading lines from the stream to a separate string is even needed, maybe we can just work with offsets that can denote the current position and the beginning and end of the line that is going to be parsed.
+<p>All of these things seem pretty simple but what makes it complicated is that we want to be able to use all these different methods while retaining a link to the actual position of what character we are on in the byte stream. This way when we ignore some cue text we can tell exactly where it ignored that cue text and spit that out into a logger. That means that we can't be creating separate string, or pointers, that are completely decoupled from the byte stream, because we will lose the ability to see where it ignored cue text.</p>
 
-I don't think this problem is particularly hard. It just gave my team a lot of trouble because we didn't know all the ways in which the parser would require us to work with text. If we rewrote it again, which we will, we could solve this problem probably pretty easily.
+<p>One thing to think about is whether or not loading lines from the stream to a separate string is even needed, maybe we can just work with offsets that can denote the current position and the beginning and end of the line that is going to be parsed.</p>
 
-<strong>Data Structure</strong>
+<p>I don't think this problem is particularly hard. It just gave my team a lot of trouble because we didn't know all the ways in which the parser would require us to work with text. If we rewrote it again, which we will, we could solve this problem probably pretty easily.</p>
 
-The main thing here for our track cue text data structure, I discussed this a while ago, is whether or not we should squash the different types of nodes into a couple of main nodes, or if we should keep them separate.
+<h3>Data Structure</h3>
 
-If we squash them it will simplify the code a bit but might be hard in the future to modify the code if the specification changes a lot and we end up having to separate the squashed data structure.
+<p>The main thing here for our track cue text data structure, I discussed this a while ago, is whether or not we should squash the different types of nodes into a couple of main nodes, or if we should keep them separate.</p>
 
-If we keep the data structure roughly as the way it is now it will allow more flexibility in the future if we need to change any one of the node type structs because the specification changes. Keeping the data structure as separate as possible will align us with the design principle of separation of concerns.
+<p>If we squash them it will simplify the code a bit but might be hard in the future to modify the code if the specification changes a lot and we end up having to separate the squashed data structure.</p>
 
-This is definitely something I think we need to discuss as a class and make a decision on.
+<p>If we keep the data structure roughly as the way it is now it will allow more flexibility in the future if we need to change any one of the node type structs because the specification changes. Keeping the data structure as separate as possible will align us with the design principle of separation of concerns.</p>
 
-<strong>UTF8</strong>
+<p>This is definitely something I think we need to discuss as a class and make a decision on.</p>
 
-As I worked on the C parser I started work on a general <a href="http://epsilon812.wordpress.com/2012/10/26/webvtt-0-2-release-update-oct-26-2012/">UTF-8 library</a> that our parser could rely on. I did this because at the time I thought we needed to be able to work with UTF-8 in order to parse the WebVTT byte stream correctly.
+<h3>UTF8</h3>
 
-As I learnt about UTF8 more while writing the library I realized one major thing - all the characters that the parser needs to work with in order to parse the byte stream are represented in UTF8 with the same code points that ASCII uses. This means that in order to parse the stream we do not need to have specific functions that can deal with for example a '&lt;' UTF8 code point, we can simply use the regular standards for working with ASCII that C code classically uses.
+<p>As I worked on the C parser I started work on a general <a href="/2012/10/26/webvtt-0-2-release-update-oct-26-2012.html">UTF-8 library</a> that our parser could rely on. I did this because at the time I thought we needed to be able to work with UTF-8 in order to parse the WebVTT byte stream correctly.</p>
 
-The support that we do need to provide for UTF8, the only thing that the WebVTT specification mentions, is conversion of the byte stream to UTF8 upon the beginning of the parser routine.
+<p>As I learnt about UTF8 more while writing the library I realized one major thing - all the characters that the parser needs to work with in order to parse the byte stream are represented in UTF8 with the same code points that ASCII uses. This means that in order to parse the stream we do not need to have specific functions that can deal with for example a '&lt;' UTF8 code point, we can simply use the regular standards for working with ASCII that C code classically uses.</p>
 
-The final thing that I found out was that the WebVTT specification makes no mention of what kind of character encoding the parser should be emitting at the end of the program i.e. for rendering purposes. I was talking to a class mate who was saying that we should probably use UTF16 as this is most compatible with Firefox and many other applications and frameworks. This is probably something that we should put up for discussion in class at some point.
+<p>The support that we do need to provide for UTF8, the only thing that the WebVTT specification mentions, is conversion of the byte stream to UTF8 upon the beginning of the parser routine.</p>
 
-<strong>Final Notes</strong>
+<p>The final thing that I found out was that the WebVTT specification makes no mention of what kind of character encoding the parser should be emitting at the end of the program i.e. for rendering purposes. I was talking to a class mate who was saying that we should probably use UTF16 as this is most compatible with Firefox and many other applications and frameworks. This is probably something that we should put up for discussion in class at some point.</p>
 
-You can checkout the code <a href="https://github.com/RickEyre/webvtt/tree/c-parser/webvtt-parser-new">here</a>.
+<h3>Final Notes</h3>
 
-We haven't provided a way to parse the text track cue settings yet and the cue text function does not load the data structure with the appropriate data yet.
+<p>You can checkout the code <a href="https://github.com/RickEyre/webvtt/tree/c-parser/webvtt-parser-new">here</a>.
 
-We haven't provided or even looked at the capability to parse only pieces of the byte stream at a time. We need to have this because when the parser will be used on a browser the browser will only provide small pieces of the WebVTT as it is downloading it.
+<p>We haven't provided a way to parse the text track cue settings yet and the cue text function does not load the data structure with the appropriate data yet.</p>
 
-There's a lot of smelly code in our C parser. We just need to rewrite it.
+<p>We haven't provided or even looked at the capability to parse only pieces of the byte stream at a time. We need to have this because when the parser will be used on a browser the browser will only provide small pieces of the WebVTT as it is downloading it.</p>
+
+<p>There's a lot of smelly code in our C parser. We just need to rewrite it.</p>

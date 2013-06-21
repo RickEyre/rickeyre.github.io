@@ -2,45 +2,24 @@
 layout: post
 title: WebVTT Release... 0.4?
 tags:
-- c
-- Open Source
-- Seneca College
 - seneca college
 - mozilla
-- software
-- software-development
-- technology
-- w3c specification
-- webvtt
-- WEBVTT
 - open-source
 status: publish
 type: post
 published: true
-meta:
-  _wpas_done_1575533: '1'
-  publicize_twitter_user: epsilon812
-  _publicize_done_external: a:1:{s:8:"facebook";a:1:{i:503100574;b:1;}}
-  _wpas_done_1604132: '1'
-  _wpas_done_1604135: '1'
-  publicize_reach: a:3:{s:7:"twitter";a:1:{i:1604132;i:11;}s:2:"fb";a:1:{i:1575533;i:212;}s:2:"wp";a:1:{i:0;i:8;}}
-  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2012-11-29
-    03:53:25";}
-  _wpas_skip_1575533: '1'
-  _wpas_skip_1604132: '1'
-  _wpas_skip_1604135: '1'
 ---
-We've been working on the 0.4 release of WebVTT, but have ran into some problems. It was the original plan to have most of our test suite setup and unit tests done by 0.3, but we had a set back that pushed that into this release.
+<p>We've been working on the 0.4 release of WebVTT, but have ran into some problems. It was the original plan to have most of our test suite setup and unit tests done by 0.3, but we had a set back that pushed that into this release.</p>
 
-During 0.3 release we were planning on using <a href="https://npmjs.org/package/node-ffi">node-ffi</a>, a JavaScript library for foreign programming languages. This allows you to bind functions, types, classes, etc, that were written in another programming language into JavaScript. We had some trouble getting it to work and were unable to get things like void * and call backs working in it.
+<p>During 0.3 release we were planning on using <a href="https://npmjs.org/package/node-ffi">node-ffi</a>, a JavaScript library for foreign programming languages. This allows you to bind functions, types, classes, etc, that were written in another programming language into JavaScript. We had some trouble getting it to work and were unable to get things like void * and call backs working in it.</p>
 
-Long story short - we began to use Google Tests to write our Unit Tests. During this we wrote C++ wrappers that allow us to use our C parser in C++. The C++ wrappers allow us to work very easily with Google Test.
+<p>Long story short - we began to use Google Tests to write our Unit Tests. During this we wrote C++ wrappers that allow us to use our C parser in C++. The C++ wrappers allow us to work very easily with Google Test.</p>
 
-<strong>Node C++ Wrappers</strong>
+<h3>Node C++ Wrappers</h3>
 
-I wrote some Node C++ wrappers that will allow us to work with the parsed cue text tag's data. The cue text data gets converted into a tree of 'nodes'. I've talked about this in my previous posts, so you can check on that if you want more information.
+<p>I wrote some Node C++ wrappers that will allow us to work with the parsed cue text tag's data. The cue text data gets converted into a tree of 'nodes'. I've talked about this in my previous posts, so you can check on that if you want more information.</p>
 
-[sourcecode language="cpp"]
+{% highlight c %}
 // .h file
 #ifndef __WEBVTTXX_NODE__
 #	define __WEBVTTXX_NODE__
@@ -178,11 +157,11 @@ const TimeStampNode * Node::toTimeStampNode() const
 }
 
 #endif
-[/sourcecode]
+{% endhighlight %}
 
-I've written a NodeFactory that takes care of the creation of Nodes. The Node Factory is called in the cue-&gt;getHead() and node-&gt;child() C++ wrappers currently.
+<p>I've written a NodeFactory that takes care of the creation of Nodes. The Node Factory is called in the cue-&gt;getHead() and node-&gt;child() C++ wrappers currently</p>
 
-[sourcecode language="cpp"]
+{% highlight c %}
 // .file
 #ifndef __WEBVTTXX_NODE_FACTORY__
 #	define __WEBVTTXX_NODE_FACTORY__
@@ -223,17 +202,17 @@ const Node * NodeFactory::createNode( webvtt_node_ptr otherNode )
 
 }
 #endif
-[/sourcecode]
+{% endhighlight %}
 
-One thing to note:
-<ul>
-<ul>
-	<li><span style="line-height:16px;">This way of using a node factory and writing code like node-&gt;child()-&gt;to"SomeNodeType" creates many memory leaks because every time you call "child()" it will create a Node object on the heap and if you don't keep track of those nodes, as is currently the case in our Unit Test code, it will create a memory leak. </span></li>
-</ul>
-</ul>
-I also added a StringList wrapper that will wrap the webvtt_string_list struct. This struct is used to keep track of the varying number of css classes that may be applied to a webvtt cue text tag.
+<p>One thing to note:</p>
 
-[sourcecode language="cpp"]
+<ul>
+	<li>This way of using a node factory and writing code like node-&gt;child()-&gt;to"SomeNodeType" creates many memory leaks because every time you call "child()" it will create a Node object on the heap and if you don't keep track of those nodes, as is currently the case in our Unit Test code, it will create a memory leak.</li>
+</ul>
+
+<p>I also added a StringList wrapper that will wrap the webvtt_string_list struct. This struct is used to keep track of the varying number of css classes that may be applied to a webvtt cue text tag.</p>
+
+{% highlight c %}
 class StringList
 {
 public:
@@ -255,13 +234,13 @@ public:
 private:
 	webvtt_string_list stringList;
 };
-[/sourcecode]
+{% endhighlight c %}
 
-<strong>Unit Test Fixtures</strong>
+<h3>Unit Test Fixtures</h3>
 
-We've also added two Unit Test Fixtures that allow you to work with cues and nodes more easily.The first is the Cue Test Fixture:
+<p>We've also added two Unit Test Fixtures that allow you to work with cues and nodes more easily.The first is the Cue Test Fixture:</p>
 
-[sourcecode language="cpp"]
+{% highlight c %}
 #ifndef __CUE_TEXTFIXTURE_H__
 #   define __CUE_TEXTFIXTURE_H__
 
@@ -323,11 +302,11 @@ private:
 };
 
 #endif
-[/sourcecode]
+{% endhighlight %}
 
-The second is the Node test fixture which is inherited from the Cue test fixture:
+<p>The second is the Node test fixture which is inherited from the Cue test fixture:</p>
 
-[sourcecode language="cpp"]
+{% highlight c %}
 #ifndef __PAYLOADNODE_TESTFIXTURE_H__
 #	define __PAYLOADNODE_TESTFIXTURE_H__
 
@@ -343,15 +322,16 @@ protected:
 };
 
 #endif
-[/sourcecode]
+{% endhighlight %}
 
-The node test fixture doesn't do much currently. It could be expanded though to keep track of all the Nodes that are created so that it can release them at the end of the Unit Tests. This would solve the memory leakage problem that I mentioned earlier. This would be good to because the Unit Tests wouldn't need to care about memory leakage.
+<p>The node test fixture doesn't do much currently. It could be expanded though to keep track of all the Nodes that are created so that it can release them at the end of the Unit Tests. This would solve the memory leakage problem that I mentioned earlier. This would be good to because the Unit Tests wouldn't need to care about memory leakage.</p>
 
-<strong>Unit Tests</strong>
+<h3>Unit Tests</h3>
 
-Finally, I've added a few broad categories of Payload Unit Tests i.e. Unit Tests that work with the tree of nodes, or primarily the Payload of the cue text which will contain cue text tags. Others can either add their own categories or fit their tests into the appropriate Unit Test that I've created. The Unit Tests are:
+<p>Finally, I've added a few broad categories of Payload Unit Tests i.e. Unit Tests that work with the tree of nodes, or primarily the Payload of the cue text which will contain cue text tags. Others can either add their own categories or fit their tests into the appropriate Unit Test that I've created. The Unit Tests are:</p>
+
 <ul>
-	<li><span style="line-height:16px;">plboldtag_unittest.cpp - Bold cue text tag tests</span></li>
+	<li>plboldtag_unittest.cpp - Bold cue text tag tests</li>
 	<li>plitalictag_unittest.cpp - Italic cue text tag tests</li>
 	<li>plvoicetag_unittest.cpp - Voice cue text tag tests</li>
 	<li>plclasstag_unittest.cpp - Class cue text tag tests</li>
@@ -361,9 +341,10 @@ Finally, I've added a few broad categories of Payload Unit Tests i.e. Unit Tests
 	<li>plescapecharacter_unittest.cpp - Takes care testing that escape characters are parsed correctly i.e. &amp;amp; &amp;lrm; &amp;rlm;</li>
 	<li>pltagformat_unittest.cpp - Takes care of the general rules of how to parse a cue text start and end tag</li>
 </ul>
-Here's an example of what we can do with the Node C++ wrappers and Unit Tests:
 
-[sourcecode language="cpp"]
+<p>Here's an example of what we can do with the Node C++ wrappers and Unit Tests:</p>
+
+{% highlight c %}
 #include &quot;payload_testfixture&quot;
 class PayloadBoldTag : public PayloadTest {};
 
@@ -464,9 +445,10 @@ TEST_F(PayloadBoldTag,DISABLED_BoldTagMultiSubclass)
 	expectedString = String( (const byte *)&quot;subclass&quot;, 8 );
 	ASSERT_EQ( expectedString.text(), cssClasses.stringAtIndex( 1 ).text() );
 }
-[/sourcecode]
+{% endhighlight %}
 
-To wrap up I'll list some things I think we need to work on in the future for the parse and Unit Tests.
+<p>To wrap up I'll list some things I think we need to work on in the future for the parse and Unit Tests.</p>
+
 <ol>
 	<li><span style="line-height:16px;">Figure out a way to track memory allocations in the Unit Tests in order to stop a lot of the memory leaks there. The Node classes are a big cause of these. </span></li>
 	<li>I think we need to redesign the C Node data structure as a whole. It's hard to debug right now because the InternalNode and LeafNode are stored as void * so when your debugging you can't just view it's data in real time. I think we could also make it simpler somehow. Maybe, if we just squashed all the types into one type and then do operations on it based on its node kind - we could have one function that deals with this type of stuff and then call that form everywhere else in the code.</li>

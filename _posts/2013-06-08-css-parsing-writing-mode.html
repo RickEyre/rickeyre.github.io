@@ -2,48 +2,13 @@
 layout: post
 title: 'CSS Parsing: Writing-mode'
 tags:
-- CDOT
-- cdot
-- css
-- CSS
-- css parsing
-- css properties
-- css property values
-- dom nodes
-- gecko
-- gecko layout
-- Layout
-- layout
 - mozilla
-- Mozilla
-- Open Source
 - open-source
-- seneca
-- Seneca College
+- cdot
 - seneca college
-- software
-- software-development
-- technology
-- text-orientation
-- vertical-text
-- w3c
-- webvtt
-- WEBVTT
-- mozilla
-- whatwg
-- writing-mode
 status: publish
 type: post
 published: true
-meta:
-  _publicize_pending: '1'
-  _wpas_done_1604135: '1'
-  publicize_twitter_user: epsilon812
-  _wpas_done_1604132: '1'
-  _publicize_done_external: a:1:{s:7:"twitter";a:1:{i:384903786;b:1;}}
-  publicize_reach: a:2:{s:7:"twitter";a:1:{i:1604132;i:41;}s:2:"wp";a:1:{i:0;i:10;}}
-  tagazine-media: a:7:{s:7:"primary";s:0:"";s:6:"images";a:0:{}s:6:"videos";a:0:{}s:11:"image_count";i:0;s:6:"author";s:8:"27352422";s:7:"blog_id";s:8:"40237434";s:9:"mod_stamp";s:19:"2013-06-08
-    03:08:09";}
 ---
 <p>One of the things I've been working on since I got back from Taipei has been helping with the implementation of vertical-text in Gecko which WEBVTT needs to support. The small way in which I helped out was to implement the <a href="http://dev.w3.org/csswg/css-writing-modes/#writing-mode">"writing-mode"</a> property in the style system. Basically this is just getting the Gecko CSS parser/scanner to understand the new property and be able to process it correctly. This was fairly easy to implement due to <a href="http://blog.dholbert.org/search/label/mozilla">Daniel Holbert</a> (:dholbert) giving me an awesome walkthrough of the things that would need to change in order for this to work and also an example <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=702508">bug</a> where he did a similar thing. So after half a day doing the initial code and a few rounds of review it <a href="https://hg.mozilla.org/mozilla-central/rev/3e2d3f3235b4">landed</a> in the tree and we're now one step closer to vertical text!</p>
 
