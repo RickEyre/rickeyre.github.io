@@ -27,6 +27,11 @@ ul {
   padding-right: 20px;
 }
 
+.inline-content {
+  padding-top: 10px;
+  padding-bottom: 25px;
+}
+
 .tag-line {
   line-height:1;
   color:#999;
