@@ -14,15 +14,17 @@ ul {
   padding-top: 5px;
 }
 
-.thumbnail {
-  text-align: center;
+.main-header {
+  margin: 20px 0px 20px;
 }
 
-.img-polaroid {
-  text-align: center;
+.centered {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.content {
+.nested-content {
   padding-left: 20px;
   padding-right: 20px;
 }
@@ -46,19 +48,4 @@ ul {
 .caption {
   color:#999;
   font-size: small;
-}
-
-.main-header {
-  margin: 20px 0px 20px;
-}
-
-.centered {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.video {
-  padding-top: 10px;
-  padding-bottom: 25px;
 }
