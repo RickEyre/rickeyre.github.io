@@ -29,10 +29,8 @@ So what is a makefile exactly? A makefile is a file that specifies how to buil
 
 A 'rule' and a 'recipe' in a makefile tells the makefile how and when to build a target file. For example:
 
-```
-  main.obj : main.c
-  bcc –ms –c main.c
-```
+    main.obj : main.c
+    bcc –ms –c main.c
 
 The rule, first line, tells the makefile that in order to build main.obj it must first have the file main.c. The recipe, second line, tells the makefile that to get from main.c to main.obj it must use the shell command  <em>bcc -ms -c main.c. </em>You can have as many dependencies for one target as you want and your dependencies can have dependencies, so you see how it can get complicated fast.
 
@@ -41,10 +39,11 @@ In the GNU makefile the recipe portion of the make 'command' is basically shell
 Another thing that a makefile has are macros. These macros are simliar to the macros in most programming languages in that they let you specify variables ahead of time that can be anything from names of files, to folders, to lists of different things, etc.
 
 Here is an example of a macro from the WebVTT makefile:
-```
-SRC_DIR = .
-TEST_DIR = $(SRC_DIR)/test
-```
+
+
+    SRC_DIR = .
+    TEST_DIR = $(SRC_DIR)/test
+
 
 The final thing that you can use in GNU Make, I don't know about other versions of make, are predefined functions such as the [for each](http://www.gnu.org/software/make/manual/make.html#Foreach-Function) loop that help you transform text. The functions that are provided serve the primary purpose to allow the manipulation of text to format directory or file path names.
 
