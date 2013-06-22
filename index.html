@@ -4,8 +4,6 @@ layout: default
 {% for post in paginator.posts %}
   <span class="tag-line">{{ post.date | date_to_string }}</span>
   <h1><a href="{{ post.url }}">{{ post.title }}</a></h1>
-  <div>
-    {{ post.content }}
-    <hr/>
-  </div>
+  {{ post.content }}
+  <hr/>
 {% endfor %}
