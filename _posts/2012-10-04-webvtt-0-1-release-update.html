@@ -63,7 +63,7 @@ WEBVTT
 
 <p>Now that we had a custom .test file we needed to parse it before we ran it through the Node module in order to rip out the WebVTT section. In order to address this issue I wrote a custom test file <a href="http://goo.gl/bujka">parser</a> in Python and changed the Makefile to run it before running the test harness. We were running this configuration for a while when my Professor told me that rather than the Python script looping through the .test directories and ripping the WebVTT, the Makefile should determine what tests files need to be ripped and call the Python script for each individual test file. In accordance with this I spent a lot of time working with our Makefile trying to figure out how to get it to run the way that we wanted it too. Through this I learnt a lot about Makefiles (I will do a blog post later to talk about this in detail) and after much struggle, and with the help of one of my <a href="http://caitpotter.blogspot.ca/">class mates</a> as well as my <a href="http://vocamus.net/dave/">Professor</a>, we got it <a href="https://github.com/RickEyre/webvtt/blob/5d4295a204084b59aaeb50a5f424b80daea2b1ce/Makefile">working</a>. In order to implement this correctly we had to add a few lines to the Makefile:</p>
 
-{% highlight bash %}
+{% highlight cmake %}
 SRC_DIR = .
 TEST_DIR = $(SRC_DIR)/test
 SPEC_DIR = $(TEST_DIR)/spec
