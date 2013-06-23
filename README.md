@@ -1,5 +1,7 @@
 ## Rick Eyre's Blog
 Personal webpage and blog.
 
-## License
-[Free As in Hugs](http://blog.izs.me/post/48281002063/free-as-in-hugs-licence)
+## Licenses
+* Content Created by Me -- [Creative Commons](http://creativecommons.org/licenses/by-sa/3.0/)
+* Bootstrap and Bootswatch -- [Apache](http://www.apache.org/licenses/LICENSE-2.0)
+* Jekyll -- [MIT](http://opensource.org/licenses/MIT)
