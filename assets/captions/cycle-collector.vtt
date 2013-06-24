@@ -453,7 +453,7 @@ And that's because it sees a count of 2 on A?
 <v Kyle> So, yeah, the first way to improve performance is to not do unecessary add reffing and releasing.
 
 19:40.000 --> 19:51.000
-<v Kyle> The second way, and you will probably never have to worry about this, but the second way is that Ali implemented, basically a bunch of performance optimizations
+<v Kyle> The second way, and you will probably never have to worry about this, but the second way is that Olli implemented, basically a bunch of performance optimizations
 
 19:52.000 --> 19:59.000
 <v Kyle> where in addition to those traverse, trace, and unlink functions, you can also implement some other functions that let you short circuit the cycle collector.
@@ -1077,7 +1077,7 @@ So.. Yeah there aren't great tools for that.
 
 10
 00:50:28.181 --> 00:50:32.804
-Usually at this point you call Ali and try to get them to help you
+Usually at this point you call Olli and try to get them to help you
 
 11
 00:50:32.804 --> 00:50:39.106
