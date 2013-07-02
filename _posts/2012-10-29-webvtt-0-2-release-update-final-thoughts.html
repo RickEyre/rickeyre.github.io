@@ -47,7 +47,7 @@ published: true
 
 <p>As I worked on the C parser I started work on a general <a href="/2012/10/26/webvtt-0-2-release-update-oct-26-2012.html">UTF-8 library</a> that our parser could rely on. I did this because at the time I thought we needed to be able to work with UTF-8 in order to parse the WebVTT byte stream correctly.</p>
 
-<p>As I learnt about UTF8 more while writing the library I realized one major thing - all the characters that the parser needs to work with in order to parse the byte stream are represented in UTF8 with the same code points that ASCII uses. This means that in order to parse the stream we do not need to have specific functions that can deal with for example a '&lt;' UTF8 code point, we can simply use the regular standards for working with ASCII that C code classically uses.</p>
+<p>As I learnt about UTF8 more while writing the library I realized one major thing - all the characters that the parser needs to work with in order to parse the byte stream are represented in UTF8 with the same code points that ASCII uses. This means that in order to parse the stream we do not need to have specific functions that can deal with for example a '<' UTF8 code point, we can simply use the regular standards for working with ASCII that C code classically uses.</p>
 
 <p>The support that we do need to provide for UTF8, the only thing that the WebVTT specification mentions, is conversion of the byte stream to UTF8 upon the beginning of the parser routine.</p>
 

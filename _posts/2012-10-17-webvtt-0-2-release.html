@@ -65,10 +65,10 @@ struct LeafNode
 {% highlight c %}
 if (mode == 1)
 {
-	switch (node-&gt;internalNode-&gt;internalNodeType)
+	switch (node->internalNode->internalNodeType)
 	{
 		case Bold:
-			RenderBold((struct BoldNode)node-&gt;internalNode-&gt;concreteNode);
+			RenderBold((struct BoldNode)node->internalNode->concreteNode);
 	}
 }
 {% endhighlight %}

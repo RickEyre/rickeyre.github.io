@@ -19,7 +19,7 @@ published: true
 
 <h3>UPDATE Oct 29:</h3>
 
-<p>I realized this morning that this won't work for cases such as '&lt;i&gt; text &lt;/i&gt; more &lt;b&gt; text &lt;/b&gt;'.</p>
+<p>I realized this morning that this won't work for cases such as '<i> text </i> more <b> text </b>'.</p>
 
 <p>I thought of a better algorithm and will post later.</p>
 
@@ -37,12 +37,12 @@ published: true
 {% highlight c %}
 int find_end_tag(text, min_index ,*max_index, expected, *leaf_node) {
 
-  for (i = max_index; text[i] != '&gt;' &amp;&amp; i &gt; min_index; i++);
+  for (i = max_index; text[i] != '>' && i > min_index; i++);
 
-    if (i == 0 || text[--i] != expected || text[--i] != '/' || text[--i] != '&lt;')
+    if (i == 0 || text[--i] != expected || text[--i] != '/' || text[--i] != '<')
       return 0;
 
-    if (i &lt; max_index - 3) {
+    if (i < max_index - 3) {
       leaf_node = new leaf_node();
       leaf_node.type = text;
       leaf_node.text = substring(text, i, max_index);
@@ -57,8 +57,8 @@ int parse_cue_text(text, node, min, max) {
   lead_node_start, leaf_node_end;
   char expected = '';
 
-  for (i = min; i &lt; max; i++) {
-    if (text[i] == '&lt;') { 
+  for (i = min; i < max; i++) {
+    if (text[i] == '<') { 
       switch (text[++i]) {
         case 'i':
           expected = 'i';
@@ -67,14 +67,14 @@ int parse_cue_text(text, node, min, max) {
         case else:
           return 0;
         } 
-      if (text[++i] != '&gt;')
+      if (text[++i] != '>')
         return 0;
 
   //If it cannot find end tag
-  if (!find_end_tag(text, i, &amp;max, expected, &amp;leaf_node_end))
+  if (!find_end_tag(text, i, &max, expected, &leaf_node_end))
     return 0;
   //If there is text between the start of min and where the found tag starts then  create a leaf node of text
-  if (min &lt; i)
+  if (min < i)
     leaf_node_start = new leaf_node(text_type_enum, text.substring(min, i));
 
   node.node_list.add(leaf_node_start);
@@ -83,18 +83,18 @@ int parse_cue_text(text, node, min, max) {
   node.node_list.add(new internal_node(expected));
 
   //Parse the next part of the cue text
-  if (!parse_cue_text(text, node.node_list[node.node_list.length()], &amp;min, &amp;max))
+  if (!parse_cue_text(text, node.node_list[node.node_list.length()], &min, &max))
     return 0;
   node.node_list.add(leaf_node_end);
 
-  if (min &lt; max) 
+  if (min < max) 
     node.node_list.add(new leaf_node(text_type_enum, text.substring(min, max))); 
   return 1; 
 }
 
 int parse_text(cue) {
   //Failed cue text
-  if (!parse_cue_text(cue_text_line, cue-&gt;head, 0, cue_text_line.length())
+  if (!parse_cue_text(cue_text_line, cue->head, 0, cue_text_line.length())
     return 0;
   //Captured no cue text
   if (cue.head.node_list.length())

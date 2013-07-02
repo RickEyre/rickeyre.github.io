@@ -56,13 +56,13 @@ int is_utf8_code_point(char *s) {
    * It starts with the maximum byte identifier available and shifts the bits to the left each iteration to check the next highest code point identifier.
    * If it reaches lowest code point identifier possible it will return a fail.
    */
-  for (i = 6; i &gt; 1; i--) {
-    if (*s &amp; code_point_start_and == code_point_start) {
+  for (i = 6; i > 1; i--) {
+    if (*s & code_point_start_and == code_point_start) {
       required_number_of_bytes = i;
       s++;
     } else {
-      code_point_start &lt;&lt;= code_point_start;
-      code_point_start_and &lt;&lt;= code_point_start_and;
+      code_point_start <<= code_point_start;
+      code_point_start_and <<= code_point_start_and;
     }
   }
 
@@ -77,10 +77,10 @@ int is_utf8_code_point(char *s) {
    * It starts at 1 because the code point identifier byte has already been found and counted.
    * If each one of the bytes within the code point does not start with the hex value 10XX XXXX, where X represents possible bits to encode the character, than it will return a fail.
    */
-  for (i = 1; i &lt; required_number_of_bytes; i++) {
+  for (i = 1; i < required_number_of_bytes; i++) {
     if (*s == NULL_BYTE)
       return 0;
-    if (*s &amp; UTF8_CODE_POINT_INTERNAL_BYTE_IDENTIFIER_AND == UTF8_CODE_POINT_INTERNAL_BYTE_IDENTIFIER)
+    if (*s & UTF8_CODE_POINT_INTERNAL_BYTE_IDENTIFIER_AND == UTF8_CODE_POINT_INTERNAL_BYTE_IDENTIFIER)
       s++;
     else
       return 0;
@@ -90,7 +90,7 @@ int is_utf8_code_point(char *s) {
 }
 {% endhighlight %}
 
-<p>The function determines if the passed char array contains a UTF-8 code point. It assumes that the first char pointed to is the leading byte. It will then do a series of &amp; operations on the leading byte to determine if it has the proper amount of high order bits and zeros. If it finds a match it will then loop through the continuation bytes to see if the amount of continuation bytes that the leading byte requires is met.</p>
+<p>The function determines if the passed char array contains a UTF-8 code point. It assumes that the first char pointed to is the leading byte. It will then do a series of & operations on the leading byte to determine if it has the proper amount of high order bits and zeros. If it finds a match it will then loop through the continuation bytes to see if the amount of continuation bytes that the leading byte requires is met.</p>
 
 <p>Some things to note:</p>
 

@@ -76,8 +76,8 @@ typedef enum
 void checkWebVttMarker(WebVttBufferInfo *webVtt)
 {
 	// Check for BOM character and skip it if found
-	if (webVtt-&gt;position[0] == FIRST_BOM_BYTE &amp;&amp; webVtt-&gt;position[1] == SECOND_BOM_BYTE &amp;&amp; webVtt-&gt;position[2] == THIRD_BOM_BYTE)
-		webVtt-&gt;position += 3;
+	if (webVtt->position[0] == FIRST_BOM_BYTE && webVtt->position[1] == SECOND_BOM_BYTE && webVtt->position[2] == THIRD_BOM_BYTE)
+		webVtt->position += 3;
 
 	// Read the first line of the WebVtt
 	loadLine(webVtt);
@@ -86,10 +86,10 @@ void checkWebVttMarker(WebVttBufferInfo *webVtt)
 	//		- First line is less than 6 characters long
 	//		- First 6 chracters are not equal to WEBVTT
 	//		- Possible seventh character must either be SPACE or TAB
-	if (strlen(webVtt-&gt;currentLine) &lt; 6 || 		 	    
-	    memcmp(webVtt-&gt;currentLine, &quot;WEBVTT&quot;, 6) ||
-	    strlen(webVtt-&gt;currentLine) &gt; 6 &amp;&amp; webVtt-&gt;currentLine[7] != TAB &amp;&amp; webVtt-&gt;currentLine[7] != SPACE)
-	    webVtt-&gt;state = MalformedWebVttMarker;
+	if (strlen(webVtt->currentLine) <; 6 || 		 	    
+	    memcmp(webVtt->currentLine, "WEBVTT", 6) ||
+	    strlen(webVtt->currentLine) > 6 && webVtt->currentLine[7] != TAB && webVtt->currentLine[7] != SPACE)
+	    webVtt->state = MalformedWebVttMarker;
 }
 {% endhighlight %}
 
@@ -116,15 +116,15 @@ void checkWebVttMarker(WebVttBufferInfo *webVtt)
 <p>Here is the changed code:</p>
 
 {% highlight python %}
-&quot;&quot;&quot;Totals that relate to tests that should always pass or fail&quot;&quot;&quot;
+"Totals that relate to tests that should always pass or fail"
 passed_total = 0
 failed_total = 0
 
-&quot;&quot;&quot;Totals that relate to tests that should pass but are known to fail&quot;&quot;&quot;
+"Totals that relate to tests that should pass but are known to fail"
 known_good_passed_total = 0
 known_good_failed_total = 0
 
-&quot;&quot;&quot;Totals that relate to tests that should fail but pass&quot;&quot;&quot;
+"Totals that relate to tests that should fail but pass"
 known_bad_passed_total = 0
 known_bad_failed_total = 0
 
@@ -144,7 +144,7 @@ for test_suite in [{'name': 'good', 'expected': 0},
     passed_total += passed;
     failed_total += failed;
 
-print &quot;\n%s Passed, %s Failed, %s Known Good, %s Known Good Expected to Fail but Passed, %s Known Bad, %s Known Bad Expected to Pass but Failed, %s Total&quot; % \
+print "\n%s Passed, %s Failed, %s Known Good, %s Known Good Expected to Fail but Passed, %s Known Bad, %s Known Bad Expected to Pass but Failed, %s Total" % \
         (passed_total, failed_total, known_good_passed_total, known_good_failed_total, known_bad_passed_total, known_bad_failed_total,
         passed_total + failed_total + known_good_passed_total + known_good_failed_total + known_bad_passed_total + known_bad_failed_total)
 {% endhighlight %}
