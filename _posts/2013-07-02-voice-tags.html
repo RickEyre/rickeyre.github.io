@@ -8,34 +8,34 @@ tags:
 - cdot
 ---
 
-For a while we've had a [bug open](https://bugzilla.mozilla.org/show_bug.cgi?id=882915)
+<p>For a while we've had a <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=882915">bug open</a>
 to update WebVTT voice tags to show the text of the speaker in the way that the spec wants
 us to. At the time I opened the bug I thought that this was something that we would need
 to be doing as that was my current understanding. As the bug has progressed though I've
-discovered a number of things.
+discovered a number of things.</p>
 
-The first was that [WebVTT voice tags](http://dev.w3.org/html5/webvtt/#dfn-webvtt-cue-voice-span)
+<p>The first was that <a href="http://dev.w3.org/html5/webvtt/#dfn-webvtt-cue-voice-span">WebVTT voice tags</a>
 aren't actually supposed to have a default display. I originally
 thought that they would as it makes sense to me that they would. Why have voice tags if
 they don't show anything? However, after a number of discussions on the public text track
-mailing list, where [Simon Pieters](https://twitter.com/zcorpan) was kind enough to help me, I found out that the original
+mailing list, where <a href="https://twitter.com/zcorpan">Simon Pieters</a> was kind enough to help me, I found out that the original
 reason for this was so that authors could turn voice tags on and off if they want and control how
 they display. It would be harder to do this if the author had to struggle with some kind of CSS
-that we've already applied to the tag.
+that we've already applied to the tag.</p>
 
-For example if the author wanted to apply custom CSS to the voice tag it may be as easy as this:
+<p>For example if the author wanted to apply custom CSS to the voice tag it may be as easy as this:</p>
 
-{% highlight css %}
+{% highlight css linenos=table %}
 ::cue(v):before { 
     content: attr(voice) ":  "; 
 }
 {% endhighlight %}
 
-Which would show:
+<p>Which would show:</p>
 
-    Title Here: Subtitle Here
+<blockquote>Title Here: Subtitle Here</blockquote>
 
-The second thing that I realized stemmed from the issue above. That is that GetCueAsHTML() is not actually 
+<p>The second thing that I realized stemmed from the issue above. That is that GetCueAsHTML() is not actually 
 what the spec would have us use to render the subtitles on the video. This is the way we're currently doing
 it in Firefox. Rather, it would like us to generate
 CSS boxes, not elements, and use those to render the subtitles on the video instead. The reasoning here is
@@ -43,15 +43,15 @@ that CSS boxes are more light weight and you might want that when updating the v
 Ralph has since told me that we can just use the same code in GetCueAsHTML() and the processing model as
 that's an internal functioning of the spec which we don't need to follow exactly. Possibly in the future we
 can switch over to using just straight up CSS boxes, if Gecko allows you to do such a thing, in order to
-get some performance boost or something. We shall have to see.
+get some performance boost or something. We shall have to see.</p>
 
-GetCueAsHTML() is primarily for showing the cue in other parts of the webpage or for custom subtitles as it's
+<p>GetCueAsHTML() is primarily for showing the cue in other parts of the webpage or for custom subtitles as it's
 apart of the exposed API. Whereas, the processing model generates a bunch of CSS boxes with positioning and
-styling applied to them specifically for rendering on the video as subtitles.
+styling applied to them specifically for rendering on the video as subtitles.</p>
 
-It's been hard to keep up with the changing spec. When we first sat down to write the browser side GetCueAsHTML()
+<p>It's been hard to keep up with the changing spec. When we first sat down to write the browser side GetCueAsHTML()
 was the only area for us to hook into; the processing model wasn't there, I'm fairly certain. So for a while
 it's been stuck in my mind that this is how it should work. I'm glad that this all came to light as I can
-move forward with a better understanding of the spec.
+move forward with a better understanding of the spec.</p>
 
-Until next time.
+<p>Until next time.</p>

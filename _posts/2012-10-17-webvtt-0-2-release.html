@@ -32,7 +32,7 @@ published: true
 
 <p>Here is an example of what we came up with:</p>
 
-{% highlight c %}
+{% highlight c linenos=table %}
 struct Node
 {
 	int mode;
@@ -62,7 +62,7 @@ struct LeafNode
 
 <p>In this way if we wanted to render a Bold WebVTT cue text we would (in pseudocode):</p>
 
-{% highlight c %}
+{% highlight c linenos=table %}
 if (mode == 1)
 {
 	switch (node->internalNode->internalNodeType)
@@ -77,14 +77,15 @@ if (mode == 1)
 
 <p>One of the other interesting things that we have implemented is a struct called WebVttBufferInfo that keeps track of the buffer information of the WebVTT file. That looks like this so far:</p>
 
-{% highlight c %}
+{% highlight c linenos=table %}
 struct WebVttBufferInfo
 {
 	// Will hold the input buffer
 	char *inputBuffer;
 	// Pointer into input buffer that denotes the current position
 	char *position;
-	// Represents a line that has been collected from the input buffer i.e. from beginning of line until CR(LF)
+	// Represents a line that has been collected from the input buffer i.e. from beginning of
+	// line until CR(LF)
 	char *currentLine;
 
 	enum WebVttBufferInfoState state;
