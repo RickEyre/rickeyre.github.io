@@ -10,8 +10,12 @@
         <div class="col-md-8 col-md-offset-2">
           {% include header.html %}
           <div class="content">
-            <span class="tag-line">{{ page.date | date_to_string }}</span>
-            <h2>{{ page.title }}</h2>
+            <span class="tag-line">
+              {{ page.date | date_to_string }}
+            </span>
+            <h2 class="post-title">
+              {{ page.title }}
+            </h2>
               {{ content }}
             <small class="small-tag-line inline-content">- Tagged in {{ page.tags | array_to_sentence_string }}.</small>
             <hr/>
