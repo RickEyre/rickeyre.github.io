@@ -25,31 +25,29 @@ that we've already applied to the tag.</p>
 
 <p>For example if the author wanted to apply custom CSS to the voice tag it may be as easy as this:</p>
 
-{% highlight css linenos=table %}
+<pre class="prettyprint">
 ::cue(v):before { 
     content: attr(voice) ":  "; 
 }
-{% endhighlight %}
+</pre>
 
-<p>Which would show:</p>
+<p>Which would show: <code>Title Here: Subtitle Here</code></p>
 
-<blockquote>Title Here: Subtitle Here</blockquote>
-
-<p>The second thing that I realized stemmed from the issue above. That is that GetCueAsHTML() is not actually 
+<p>The second thing that I realized stemmed from the issue above. That is that <code>GetCueAsHTML()</code> is not actually 
 what the spec would have us use to render the subtitles on the video. This is the way we're currently doing
 it in Firefox. Rather, it would like us to generate
 CSS boxes, not elements, and use those to render the subtitles on the video instead. The reasoning here is
 that CSS boxes are more light weight and you might want that when updating the video every 250 ms, heh. However,
-Ralph has since told me that we can just use the same code in GetCueAsHTML() and the processing model as
+Ralph has since told me that we can just use the same code in <code>GetCueAsHTML()</code> and the processing model as
 that's an internal functioning of the spec which we don't need to follow exactly. Possibly in the future we
 can switch over to using just straight up CSS boxes, if Gecko allows you to do such a thing, in order to
 get some performance boost or something. We shall have to see.</p>
 
-<p>GetCueAsHTML() is primarily for showing the cue in other parts of the webpage or for custom subtitles as it's
+<p><code>GetCueAsHTML()</code> is primarily for showing the cue in other parts of the webpage or for custom subtitles as it's
 apart of the exposed API. Whereas, the processing model generates a bunch of CSS boxes with positioning and
 styling applied to them specifically for rendering on the video as subtitles.</p>
 
-<p>It's been hard to keep up with the changing spec. When we first sat down to write the browser side GetCueAsHTML()
+<p>It's been hard to keep up with the changing spec. When we first sat down to write the browser side <code>GetCueAsHTML()</code>
 was the only area for us to hook into; the processing model wasn't there, I'm fairly certain. So for a while
 it's been stuck in my mind that this is how it should work. I'm glad that this all came to light as I can
 move forward with a better understanding of the spec.</p>
