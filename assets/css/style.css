@@ -1,8 +1,3 @@
-body {
-  font-size: 1em;
-  line-height: 1.4em;
-}
-
 footer {
   text-align:center;
 }
@@ -29,7 +24,7 @@ h1 {
   margin-right: auto;
 }
 
-.nested-content {
+.content {
   padding-left: 40px;
   padding-right: 40px;
 }
