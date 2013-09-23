@@ -19,14 +19,14 @@ published: true
 
 <p>I wrote some Node C++ wrappers that will allow us to work with the parsed cue text tag's data. The cue text data gets converted into a tree of 'nodes'. I've talked about this in my previous posts, so you can check on that if you want more information.</p>
 
-{% highlight c %}
+<pre class="prettyprint">
 // .h file
 #ifndef __WEBVTTXX_NODE__
-#	define __WEBVTTXX_NODE__
+# define __WEBVTTXX_NODE__
 
-#	include <webvtt/cue.h>
-#	include "string"
-#	include "timestamp"
+# include <webvtt/cue.h>
+# include "string"
+# include "timestamp"
 
 namespace WebVTT
 {
@@ -37,75 +37,75 @@ class TextNode;
 class Node
 {
 public:
-	enum NodeKind
-	{
-		Class = WEBVTT_CLASS,
-		Italic = WEBVTT_ITALIC,
-		Underline = WEBVTT_UNDERLINE,
-		Bold = WEBVTT_BOLD,
-		Ruby = WEBVTT_RUBY,
-		RubyText = WEBVTT_RUBY_TEXT,
-		Voice = WEBVTT_VOICE,
-		Text = WEBVTT_TEXT,
-		TimeStamp = WEBVTT_TIME_STAMP
-	};
+ enum NodeKind
+ {
+  Class = WEBVTT_CLASS,
+  Italic = WEBVTT_ITALIC,
+  Underline = WEBVTT_UNDERLINE,
+  Bold = WEBVTT_BOLD,
+  Ruby = WEBVTT_RUBY,
+  RubyText = WEBVTT_RUBY_TEXT,
+  Voice = WEBVTT_VOICE,
+  Text = WEBVTT_TEXT,
+  TimeStamp = WEBVTT_TIME_STAMP
+ };
 
-	inline Node( webvtt_node_ptr otherNode ) { nodePtr = otherNode; }
-	inline NodeKind kind() const { return (NodeKind)nodePtr->kind; }
+ inline Node( webvtt_node_ptr otherNode ) { nodePtr = otherNode; }
+ inline NodeKind kind() const { return (NodeKind)nodePtr->kind; }
 
-	const Node * parent() const;
-	const InternalNode * toInternalNode() const;
-	const TextNode * toTextNode() const;
-	const TimeStampNode * toTimeStampNode() const;
+ const Node * parent() const;
+ const InternalNode * toInternalNode() const;
+ const TextNode * toTextNode() const;
+ const TimeStampNode * toTimeStampNode() const;
 
-	private:
-		webvtt_node_ptr nodePtr;
+ private:
+  webvtt_node_ptr nodePtr;
 };
 
 class InternalNode : public Node
 {
 public:
-	inline InternalNode( webvtt_node_ptr otherNode )
-		: Node( otherNode )
-	{
-		internalNodePtr = (webvtt_internal_node_ptr)otherNode->concrete_node;
-	}
+ inline InternalNode( webvtt_node_ptr otherNode )
+  : Node( otherNode )
+ {
+  internalNodePtr = (webvtt_internal_node_ptr)otherNode->concrete_node;
+ }
 
-	inline String annotation() const { return String( &amp;internalNodePtr->annotation ); }
-	inline StringList cssClasses() const { return StringList( *internalNodePtr->css_classes_ptr ); }
-	inline uint childCount() const { return internalNodePtr->length; }
-	const Node * child( uint index ) const;
+ inline String annotation() const { return String( &amp;internalNodePtr->annotation ); }
+ inline StringList cssClasses() const { return StringList( *internalNodePtr->css_classes_ptr ); }
+ inline uint childCount() const { return internalNodePtr->length; }
+ const Node * child( uint index ) const;
 
 private:
-	webvtt_internal_node_ptr internalNodePtr;
+ webvtt_internal_node_ptr internalNodePtr;
 };
 
 class TextNode : public Node
 {
 public:
-	inline TextNode( webvtt_node_ptr otherNode )
-		: Node( otherNode )
-	{
-		leafNodePtr = (webvtt_leaf_node_ptr)otherNode->concrete_node;
-	}
-	inline String content() const { return String( &amp;leafNodePtr->text ); }
+ inline TextNode( webvtt_node_ptr otherNode )
+  : Node( otherNode )
+ {
+  leafNodePtr = (webvtt_leaf_node_ptr)otherNode->concrete_node;
+ }
+ inline String content() const { return String( &amp;leafNodePtr->text ); }
 
 private:
-	webvtt_leaf_node_ptr leafNodePtr;
+ webvtt_leaf_node_ptr leafNodePtr;
 };
 
 class TimeStampNode : public Node
 {
 public:
-	inline TimeStampNode( webvtt_node_ptr otherNode )
-		: Node( otherNode )
-	{
-		leafNodePtr = (webvtt_leaf_node_ptr)otherNode->concrete_node;
-	}
-	inline Timestamp timeStamp() const { return Timestamp( leafNodePtr->time_stamp ); }
+ inline TimeStampNode( webvtt_node_ptr otherNode )
+  : Node( otherNode )
+ {
+  leafNodePtr = (webvtt_leaf_node_ptr)otherNode->concrete_node;
+ }
+ inline Timestamp timeStamp() const { return Timestamp( leafNodePtr->time_stamp ); }
 
 private:
-	webvtt_leaf_node_ptr leafNodePtr;
+ webvtt_leaf_node_ptr leafNodePtr;
 };
 
 // .cpp File
@@ -117,39 +117,39 @@ namespace WebVTT
 
 const Node * Node::parent() const
 {
-	return NodeFactory::createNode( nodePtr->parent );
+ return NodeFactory::createNode( nodePtr->parent );
 }
 
 const Node * InternalNode::child( uint index ) const
 {
-	if( index <= internalNodePtr->length )
-		return NodeFactory::createNode( internalNodePtr->children[index] );
-	else
-		return 0;
+ if( index <= internalNodePtr->length )
+  return NodeFactory::createNode( internalNodePtr->children[index] );
+ else
+  return 0;
 }
 
 const InternalNode * Node::toInternalNode() const
 {
-	if( WEBVTT_IS_VALID_INTERNAL_NODE( this->kind() ) )
-		return (const InternalNode *)this;
-	else
-		throw "Invalid cast to InternalNode.";
+ if( WEBVTT_IS_VALID_INTERNAL_NODE( this->kind() ) )
+  return (const InternalNode *)this;
+ else
+  throw "Invalid cast to InternalNode.";
 }
 
 const TextNode * Node::toTextNode() const
 {
-	if( this->kind() == WEBVTT_TEXT )
-		return (const TextNode *)this;
-	else
-		throw "Invalid cast to TextNode.";
+ if( this->kind() == WEBVTT_TEXT )
+  return (const TextNode *)this;
+ else
+  throw "Invalid cast to TextNode.";
 }
 
 const TimeStampNode * Node::toTimeStampNode() const
 {
-	if( this->kind() == WEBVTT_TIME_STAMP )
-		return (const TimeStampNode *)this;
-	else
-		throw "Invalid cast to TimeStampNode.";
+ if( this->kind() == WEBVTT_TIME_STAMP )
+  return (const TimeStampNode *)this;
+ else
+  throw "Invalid cast to TimeStampNode.";
 }
 
 }
@@ -157,17 +157,17 @@ const TimeStampNode * Node::toTimeStampNode() const
 }
 
 #endif
-{% endhighlight %}
+</pre>
 
-<p>I've written a NodeFactory that takes care of the creation of Nodes. The Node Factory is called in the cue->getHead() and node->child() C++ wrappers currently</p>
+<p>I've written a <code>NodeFactory</code> that takes care of the creation of Nodes. The Node Factory is called in the <code>cue->getHead()</code> and <code>node->child()</code> C++ wrappers currently</p>
 
-{% highlight c %}
+<pre class="prettyprint">
 // .file
 #ifndef __WEBVTTXX_NODE_FACTORY__
-#	define __WEBVTTXX_NODE_FACTORY__
+# define __WEBVTTXX_NODE_FACTORY__
 
-#	include <webvtt/cue.h>
-#	include "node"
+# include <webvtt/cue.h>
+# include "node"
 
 namespace WebVTT
 {
@@ -175,7 +175,7 @@ namespace WebVTT
 class NodeFactory
 {
 public:
-	static const Node * createNode( webvtt_node_ptr otherNode );
+ static const Node * createNode( webvtt_node_ptr otherNode );
 };
 
 // .cpp file
@@ -186,61 +186,61 @@ namespace WebVTT
 
 const Node * NodeFactory::createNode( webvtt_node_ptr otherNode )
 {
-	if( !otherNode )
-		throw "Attemp to create Node from non-pointer.";
+ if( !otherNode )
+  throw "Attemp to create Node from non-pointer.";
 
-	if ( WEBVTT_IS_VALID_INTERNAL_NODE( otherNode->kind ) )
-		return new InternalNode( otherNode );
-	else if ( otherNode->kind == WEBVTT_TEXT )
-		return new TextNode( otherNode );
-	else if ( otherNode->kind == WEBVTT_TIME_STAMP )
-		return new TimeStampNode( otherNode );
-	return 0;
+ if ( WEBVTT_IS_VALID_INTERNAL_NODE( otherNode->kind ) )
+  return new InternalNode( otherNode );
+ else if ( otherNode->kind == WEBVTT_TEXT )
+  return new TextNode( otherNode );
+ else if ( otherNode->kind == WEBVTT_TIME_STAMP )
+  return new TimeStampNode( otherNode );
+ return 0;
 }
 
 }
 
 }
 #endif
-{% endhighlight %}
+</pre>
 
 <p>One thing to note:</p>
 
 <ul>
-	<li>This way of using a node factory and writing code like node->child()->to"SomeNodeType" creates many memory leaks because every time you call "child()" it will create a Node object on the heap and if you don't keep track of those nodes, as is currently the case in our Unit Test code, it will create a memory leak.</li>
+ <li>This way of using a node factory and writing code like <code>node->child()->to"SomeNodeType"</code> creates many memory leaks because every time you call <code>child()</code> it will create a <code>Node</code> object on the heap and if you don't keep track of those nodes, as is currently the case in our Unit Test code, it will create a memory leak.</li>
 </ul>
 
-<p>I also added a StringList wrapper that will wrap the webvtt_string_list struct. This struct is used to keep track of the varying number of css classes that may be applied to a webvtt cue text tag.</p>
+<p>I also added a <code>StringList</code> wrapper that will wrap the w<code>ebvtt_string_list</code> struct. This struct is used to keep track of the varying number of css classes that may be applied to a webvtt cue text tag.</p>
 
-{% highlight c %}
+<pre class="prettyprint">
 class StringList
 {
 public:
-	inline StringList( webvtt_string_list otherStringList )
-	{
-		stringList = otherStringList;
-	}
+ inline StringList( webvtt_string_list otherStringList )
+ {
+  stringList = otherStringList;
+ }
 
-	inline String stringAtIndex( uint index )
-	{
-		if( index <= stringList.length )
-			return String( &amp;stringList.items[index] );
-		return String();
-	}
+ inline String stringAtIndex( uint index )
+ {
+  if( index <= stringList.length )
+   return String( &amp;stringList.items[index] );
+  return String();
+ }
 
-	inline uint length() { return stringList.length; }
-	inline uint alloc() { return stringList.alloc; }
+ inline uint length() { return stringList.length; }
+ inline uint alloc() { return stringList.alloc; }
 
 private:
-	webvtt_string_list stringList;
+ webvtt_string_list stringList;
 };
-{% endhighlight c %}
+</pre>
 
 <h3>Unit Test Fixtures</h3>
 
 <p>We've also added two Unit Test Fixtures that allow you to work with cues and nodes more easily.The first is the Cue Test Fixture:</p>
 
-{% highlight c %}
+<pre class="prettyprint">
 #ifndef __CUE_TEXTFIXTURE_H__
 #   define __CUE_TEXTFIXTURE_H__
 
@@ -255,13 +255,13 @@ protected:
     if( parser )
     {
       try
-	  {
-	    delete parser; parser = 0;
-	  }
+   {
+     delete parser; parser = 0;
+   }
       catch( std::exception e )
-	  {
-		  int x = 5;
-	  }
+   {
+    int x = 5;
+   }
     }
   }
   void loadVtt( const char *fileName, uint expectedNumberOfCues )
@@ -302,27 +302,27 @@ private:
 };
 
 #endif
-{% endhighlight %}
+</pre>
 
 <p>The second is the Node test fixture which is inherited from the Cue test fixture:</p>
 
-{% highlight c %}
+<pre class="prettyprint">
 #ifndef __PAYLOADNODE_TESTFIXTURE_H__
-#	define __PAYLOADNODE_TESTFIXTURE_H__
+# define __PAYLOADNODE_TESTFIXTURE_H__
 
 #include "cue_testfixture"
 
 class PayloadTest : public CueTest
 {
 protected:
-	const InternalNode * getHeadOfCue( uint index )
-	{
-		return getCue( index ).nodeHead()->toInternalNode();
-	}
+ const InternalNode * getHeadOfCue( uint index )
+ {
+  return getCue( index ).nodeHead()->toInternalNode();
+ }
 };
 
 #endif
-{% endhighlight %}
+</pre>
 
 <p>The node test fixture doesn't do much currently. It could be expanded though to keep track of all the Nodes that are created so that it can release them at the end of the Unit Tests. This would solve the memory leakage problem that I mentioned earlier. This would be good to because the Unit Tests wouldn't need to care about memory leakage.</p>
 
@@ -331,125 +331,125 @@ protected:
 <p>Finally, I've added a few broad categories of Payload Unit Tests i.e. Unit Tests that work with the tree of nodes, or primarily the Payload of the cue text which will contain cue text tags. Others can either add their own categories or fit their tests into the appropriate Unit Test that I've created. The Unit Tests are:</p>
 
 <ul>
-	<li>plboldtag_unittest.cpp - Bold cue text tag tests</li>
-	<li>plitalictag_unittest.cpp - Italic cue text tag tests</li>
-	<li>plvoicetag_unittest.cpp - Voice cue text tag tests</li>
-	<li>plclasstag_unittest.cpp - Class cue text tag tests</li>
-	<li>plunderlinetag_unittest.cpp - Underline cue text tag tests</li>
-	<li>pltimestamp_unittest.cpp - Time stamp cue text tag tests</li>
-	<li>plformat_unittest.cpp - Takes care of tests relating to how a payloads overall form should be i.e. multiple lines, multiple cue tags, etc.</li>
-	<li>plescapecharacter_unittest.cpp - Takes care testing that escape characters are parsed correctly i.e. &amp;amp; &amp;lrm; &amp;rlm;</li>
-	<li>pltagformat_unittest.cpp - Takes care of the general rules of how to parse a cue text start and end tag</li>
+ <li><code>plboldtag_unittest.cpp</code> - Bold cue text tag tests</li>
+ <li><code>plitalictag_unittest.cpp</code> - Italic cue text tag tests</li>
+ <li><code>plvoicetag_unittest.cpp</code> - Voice cue text tag tests</li>
+ <li><code>plclasstag_unittest.cpp</code> - Class cue text tag tests</li>
+ <li><code>plunderlinetag_unittest.cpp</code> - Underline cue text tag tests</li>
+ <li><code>pltimestamp_unittest.cpp</code> - Time stamp cue text tag tests</li>
+ <li><code>plformat_unittest.cpp</code> - Takes care of tests relating to how a payloads overall form should be i.e. multiple lines, multiple cue tags, etc.</li>
+ <li><code>plescapecharacter_unittest.cpp</code> - Takes care testing that escape characters are parsed correctly i.e. &amp;amp; &amp;lrm; &amp;rlm;</li>
+ <li><code>pltagformat_unittest.cpp</code> - Takes care of the general rules of how to parse a cue text start and end tag</li>
 </ul>
 
 <p>Here's an example of what we can do with the Node C++ wrappers and Unit Tests:</p>
 
-{% highlight c %}
+<pre class="prettyprint">
 #include "payload_testfixture"
 class PayloadBoldTag : public PayloadTest {};
 
 /* 
  * Verifies that a bold cue text tag is parsed correctly.
  * From http://dev.w3.org/html5/webvtt/#webvtt-cue-bold-span
- *	Bold tags consist of:
- *		1. A cue span start tag "b" that disallows an annotation.
- *		2. Possible cue internal text representing the boldened text.
- *		3. A cue span end tag.
+ * Bold tags consist of:
+ *  1. A cue span start tag "b" that disallows an annotation.
+ *  2. Possible cue internal text representing the boldened text.
+ *  3. A cue span end tag.
  */
 TEST_F(PayloadBoldTag,DISABLED_BoldTag)
 {
-	loadVtt( "payload/b-tag/b-tag.vtt" );
+ loadVtt( "payload/b-tag/b-tag.vtt" );
 
-	const InternalNode *head = getHeadOfCue( 0 );
+ const InternalNode *head = getHeadOfCue( 0 );
 
-	ASSERT_TRUE( head->childCount() == 3 );
-	ASSERT_EQ( Node::Bold, head->child( 1 )->kind() );
+ ASSERT_TRUE( head->childCount() == 3 );
+ ASSERT_EQ( Node::Bold, head->child( 1 )->kind() );
 }
 
 /* 
  * Verifies that a bold tag with an annotation is parsed correctly but does not contain the annotation.
  * From http://dev.w3.org/html5/webvtt/#webvtt-cue-bold-span (11/27/2012)
- *	Bold tags consist of:
- *		1. A cue span start tag "b" that disallows an annotation.
- *		2. Possible cue internal text representing the boldened text.
- *		3. A cue span end tag.
+ * Bold tags consist of:
+ *  1. A cue span start tag "b" that disallows an annotation.
+ *  2. Possible cue internal text representing the boldened text.
+ *  3. A cue span end tag.
  */
 TEST_F(PayloadBoldTag,DISABLED_BoldAnnotation)
 {
-	loadVtt( "payload/b-tag/b-tag-annotation.vtt" );
+ loadVtt( "payload/b-tag/b-tag-annotation.vtt" );
 
-	const InternalNode *head = getHeadOfCue( 0 );
+ const InternalNode *head = getHeadOfCue( 0 );
 
-	ASSERT_TRUE( head->childCount() == 3 );
-	ASSERT_EQ( Node::Bold, head->child( 1 )->kind() );
-	ASSERT_TRUE( head->child( 1 )->toInternalNode()->annotation().text() == NULL );
+ ASSERT_TRUE( head->childCount() == 3 );
+ ASSERT_EQ( Node::Bold, head->child( 1 )->kind() );
+ ASSERT_TRUE( head->child( 1 )->toInternalNode()->annotation().text() == NULL );
 }
 
 /*
  * Verifies that a single subclass can be attached to a cue text bold start tag.
  * From http://dev.w3.org/html5/webvtt/#webvtt-cue-span-start-tag (11/27/2012)
- *	Cue span start tags consist of the following:
- *		1. A "<" character representing the beginning of the start tag.
- *		2. The tag name.
- *		3. Zero or more the following sequence representing a subclasses of the start tag
- *			3.1. A full stop "." character.
- *			3.2. A sequence of non-whitespace characters.
- *		4. If the start tag requires an annotation then a space or tab character followed by a sequence of 
- *		   non-whitespace characters representing the annotation.
- *		5. A ">" character repsenting the end of the start tag.
+ * Cue span start tags consist of the following:
+ *  1. A "<" character representing the beginning of the start tag.
+ *  2. The tag name.
+ *  3. Zero or more the following sequence representing a subclasses of the start tag
+ *   3.1. A full stop "." character.
+ *   3.2. A sequence of non-whitespace characters.
+ *  4. If the start tag requires an annotation then a space or tab character followed by a sequence of 
+ *     non-whitespace characters representing the annotation.
+ *  5. A ">" character repsenting the end of the start tag.
  */
 TEST_F(PayloadBoldTag,DISABLED_BoldTagSingleSubclass)
 {
-	loadVtt( "payload/b-tag/b-tag-single-subclass.vtt" );
+ loadVtt( "payload/b-tag/b-tag-single-subclass.vtt" );
 
-	const InternalNode *head = getHeadOfCue( 0 );
+ const InternalNode *head = getHeadOfCue( 0 );
 
-	ASSERT_TRUE( head->childCount() == 3 );
-	ASSERT_EQ( Node::Bold, head->child( 1 )->kind() );
+ ASSERT_TRUE( head->childCount() == 3 );
+ ASSERT_EQ( Node::Bold, head->child( 1 )->kind() );
 
-	StringList cssClasses = head->child( 1 )->toInternalNode()->cssClasses();
-	String expectedString = String( (const byte *)"class", 5 );
+ StringList cssClasses = head->child( 1 )->toInternalNode()->cssClasses();
+ String expectedString = String( (const byte *)"class", 5 );
 
-	ASSERT_TRUE( cssClasses.length() == 1 );
-	ASSERT_EQ(  expectedString.text(), cssClasses.stringAtIndex( 0 ).text() );
+ ASSERT_TRUE( cssClasses.length() == 1 );
+ ASSERT_EQ(  expectedString.text(), cssClasses.stringAtIndex( 0 ).text() );
 }
 
 /*
  * Verifies that multiple subclasses can be attached to a cue text bold start tag.
  * From http://dev.w3.org/html5/webvtt/#webvtt-cue-span-start-tag (11/27/2012)
- *	Cue span start tags consist of the following:
- *		1. A "<" character representing the beginning of the start tag.
- *		2. The tag name.
- *		3. Zero or more the following sequence representing a subclasses of the start tag
- *			3.1. A full stop "." character.
- *			3.2. A sequence of non-whitespace characters.
- *		4. If the start tag requires an annotation then a space or tab character followed by a sequence of 
- *		   non-whitespace characters representing the annotation.
- *		5. A ">" character repsenting the end of the start tag.
+ * Cue span start tags consist of the following:
+ *  1. A "<" character representing the beginning of the start tag.
+ *  2. The tag name.
+ *  3. Zero or more the following sequence representing a subclasses of the start tag
+ *   3.1. A full stop "." character.
+ *   3.2. A sequence of non-whitespace characters.
+ *  4. If the start tag requires an annotation then a space or tab character followed by a sequence of 
+ *     non-whitespace characters representing the annotation.
+ *  5. A ">" character repsenting the end of the start tag.
  */
 TEST_F(PayloadBoldTag,DISABLED_BoldTagMultiSubclass)
 {
-	loadVtt( "payload/b-tag/b-tag-multi-subclass.vtt" );
+ loadVtt( "payload/b-tag/b-tag-multi-subclass.vtt" );
 
-	const InternalNode *head = getHeadOfCue( 0 );
+ const InternalNode *head = getHeadOfCue( 0 );
 
-	ASSERT_TRUE( head->childCount() == 3 );
-	ASSERT_EQ( Node::Bold, head->child( 1 )->kind() );
+ ASSERT_TRUE( head->childCount() == 3 );
+ ASSERT_EQ( Node::Bold, head->child( 1 )->kind() );
 
-	StringList cssClasses = head->child( 1 )->toInternalNode()->cssClasses();
-	String expectedString = String( (const byte *)"class", 5 );
+ StringList cssClasses = head->child( 1 )->toInternalNode()->cssClasses();
+ String expectedString = String( (const byte *)"class", 5 );
 
-	ASSERT_TRUE( cssClasses.length() == 1 );
-	ASSERT_EQ(  expectedString.text(), cssClasses.stringAtIndex( 0 ).text() );
+ ASSERT_TRUE( cssClasses.length() == 1 );
+ ASSERT_EQ(  expectedString.text(), cssClasses.stringAtIndex( 0 ).text() );
 
-	expectedString = String( (const byte *)"subclass", 8 );
-	ASSERT_EQ( expectedString.text(), cssClasses.stringAtIndex( 1 ).text() );
+ expectedString = String( (const byte *)"subclass", 8 );
+ ASSERT_EQ( expectedString.text(), cssClasses.stringAtIndex( 1 ).text() );
 }
-{% endhighlight %}
+</pre>
 
 <p>To wrap up I'll list some things I think we need to work on in the future for the parse and Unit Tests.</p>
 
 <ol>
-	<li><span style="line-height:16px;">Figure out a way to track memory allocations in the Unit Tests in order to stop a lot of the memory leaks there. The Node classes are a big cause of these. </span></li>
-	<li>I think we need to redesign the C Node data structure as a whole. It's hard to debug right now because the InternalNode and LeafNode are stored as void * so when your debugging you can't just view it's data in real time. I think we could also make it simpler somehow. Maybe, if we just squashed all the types into one type and then do operations on it based on its node kind - we could have one function that deals with this type of stuff and then call that form everywhere else in the code.</li>
+ <li><span style="line-height:16px;">Figure out a way to track memory allocations in the Unit Tests in order to stop a lot of the memory leaks there. The Node classes are a big cause of these. </span></li>
+ <li>I think we need to redesign the C Node data structure as a whole. It's hard to debug right now because the <code>InternalNode</code> and <code>LeafNode</code> are stored as void * so when your debugging you can't just view it's data in real time. I think we could also make it simpler somehow. Maybe, if we just squashed all the types into one type and then do operations on it based on its node kind - we could have one function that deals with this type of stuff and then call that form everywhere else in the code.</li>
 </ol>

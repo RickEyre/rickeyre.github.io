@@ -22,9 +22,9 @@ published: true
 <p>The parser asks you to work with text in a couple different ways.</p>
 
 <ul>
-	<li>Read an entire line of text and compare a multi-character value to the string</li>
-	<li>Split text on spaces and work with those split strings</li>
-	<li>Loop through char by char and compare values</li>
+  <li>Read an entire line of text and compare a multi-character value to the string</li>
+  <li>Split text on spaces and work with those split strings</li>
+  <li>Loop through char by char and compare values</li>
 </ul>
 
 <p>All of these things seem pretty simple but what makes it complicated is that we want to be able to use all these different methods while retaining a link to the actual position of what character we are on in the byte stream. This way when we ignore some cue text we can tell exactly where it ignored that cue text and spit that out into a logger. That means that we can't be creating separate string, or pointers, that are completely decoupled from the byte stream, because we will lose the ability to see where it ignored cue text.</p>

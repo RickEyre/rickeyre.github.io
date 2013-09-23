@@ -15,54 +15,54 @@ published: true
 
 <p>I've added a TextTrackCue struct that will keep information about a WebVTT text track cue:</p>
 
-{% highlight c %}
+<pre class="prettyprint">
 /* Holds the information for a text track cue.
  * This is one entry into the WebVTT file
  * Referenced from http://dev.w3.org/html5/webvtt/#webvtt-parser-algorithm Steps 20 -29
  */
 typedef struct
 {
-	// Pointer to the head of the text track cue text list
-	Node *head;
+  // Pointer to the head of the text track cue text list
+  Node *head;
 
-	TimeStampNode timeStamp;
-	WritingDirection writingDirection;
-	Alignment cueAlignment;
-	LinePosition linePosition;
-	short pauseOnExit;
-	short snapToLines;
-	int textPosition;
-	int cueSize;
+  TimeStampNode timeStamp;
+  WritingDirection writingDirection;
+  Alignment cueAlignment;
+  LinePosition linePosition;
+  short pauseOnExit;
+  short snapToLines;
+  int textPosition;
+  int cueSize;
 
 } TextTrackCue;
-{% endhighlight %}
+</pre>
 
 <p>This struct holds all of the text track cue's information - it's HTML timings and settings as well as the text track cue text. The text track cue text is held in the "Node *head" pointer. This is a pointer to the head of the tree data structure that I described in my <a href="/2012/10/17/webvtt-0-2-release.html">previous </a>blog post. To go over that quickly again - the text track cue text contains many different markups that can be nested within each other. The WebVTT specifications tells you to use a tree data structure to represent this. We implemented this by creating a hierarchy of structs using a void pointer to hold a reference to the derived class and an enum to identify which type of struct it is.</p>
 
 <p>For the text track cue struct we also created a couple different enumerations to identify the different types of HTML that can be applied to the text track:</p>
 
-{% highlight c %}
+<pre class="prettyprint">
 // Enumerates possible HTML writing directions
 typedef enum
 {
-	Vertical,
-	Horizontal
+  Vertical,
+  Horizontal
 } WritingDirection;
 
 // Enumerates possible HTML alignments
 typedef enum
 {
-	Top,
-	Middle,
-	Bottom
+  Top,
+  Middle,
+  Bottom
 } Alignment;
 
 // Enumerates possible HTML line positions
 typedef enum
 {
-	Auto
+  Auto
 } LinePosition;
-{% endhighlight %}
+</pre>
 
 <p>We have not yet filled out all the particular enumeration options that will be available in the final implementation.</p>
 
@@ -70,28 +70,28 @@ typedef enum
 
 <p>Here is our WebVTT mark checker:</p>
 
-{% highlight c %}
+<pre class="prettyprint">
 // Checks for the correct starting format of the WebVTT file
 // Referenced from: http://dev.w3.org/html5/webvtt/#webvtt-parser-algorithm Steps 3 - 8
 void checkWebVttMarker(WebVttBufferInfo *webVtt)
 {
-	// Check for BOM character and skip it if found
-	if (webVtt->position[0] == FIRST_BOM_BYTE && webVtt->position[1] == SECOND_BOM_BYTE && webVtt->position[2] == THIRD_BOM_BYTE)
-		webVtt->position += 3;
+  // Check for BOM character and skip it if found
+  if (webVtt->position[0] == FIRST_BOM_BYTE && webVtt->position[1] == SECOND_BOM_BYTE && webVtt->position[2] == THIRD_BOM_BYTE)
+    webVtt->position += 3;
 
-	// Read the first line of the WebVtt
-	loadLine(webVtt);
+  // Read the first line of the WebVtt
+  loadLine(webVtt);
 
-	// WebVTT starting marker is malformed if:
-	//		- First line is less than 6 characters long
-	//		- First 6 chracters are not equal to WEBVTT
-	//		- Possible seventh character must either be SPACE or TAB
-	if (strlen(webVtt->currentLine) <; 6 || 		 	    
-	    memcmp(webVtt->currentLine, "WEBVTT", 6) ||
-	    strlen(webVtt->currentLine) > 6 && webVtt->currentLine[7] != TAB && webVtt->currentLine[7] != SPACE)
-	    webVtt->state = MalformedWebVttMarker;
+  // WebVTT starting marker is malformed if:
+  //    - First line is less than 6 characters long
+  //    - First 6 chracters are not equal to WEBVTT
+  //    - Possible seventh character must either be SPACE or TAB
+  if (strlen(webVtt->currentLine) <; 6 ||            
+      memcmp(webVtt->currentLine, "WEBVTT", 6) ||
+      strlen(webVtt->currentLine) > 6 && webVtt->currentLine[7] != TAB && webVtt->currentLine[7] != SPACE)
+      webVtt->state = MalformedWebVttMarker;
 }
-{% endhighlight %}
+</pre>
 
 <p>My partner<a href="http://zaf1.wordpress.com/"> Shayan Zafar</a> also started work on an error/ignore logging system for the parser. We need to implement this in order to have a way to keep track of all the cue text that the parser ignores/errors on. This will allow us to hook our test suite into the parser.</p>
 
@@ -104,9 +104,9 @@ void checkWebVttMarker(WebVttBufferInfo *webVtt)
 <p>The three types of tests we have are:</p>
 
 <ul>
-	<li>Tests that are expected to pass or fail and are known to do so</li>
-	<li>Tests that should pass but are known to fail</li>
-	<li>Tests that should fail but are known to pass</li>
+  <li>Tests that are expected to pass or fail and are known to do so</li>
+  <li>Tests that should pass but are known to fail</li>
+  <li>Tests that should fail but are known to pass</li>
 </ul>
 
 <p>Having these three types of tests we need to keep track of nine totals i.e. the pass and fail count of each. We also need to do special reporting for those tests that should pass but are known to fail but pass and vice versa.</p>
@@ -115,7 +115,7 @@ void checkWebVttMarker(WebVttBufferInfo *webVtt)
 
 <p>Here is the changed code:</p>
 
-{% highlight python %}
+<pre class="prettyprint">
 "Totals that relate to tests that should always pass or fail"
 passed_total = 0
 failed_total = 0
@@ -147,4 +147,4 @@ for test_suite in [{'name': 'good', 'expected': 0},
 print "\n%s Passed, %s Failed, %s Known Good, %s Known Good Expected to Fail but Passed, %s Known Bad, %s Known Bad Expected to Pass but Failed, %s Total" % \
         (passed_total, failed_total, known_good_passed_total, known_good_failed_total, known_bad_passed_total, known_bad_failed_total,
         passed_total + failed_total + known_good_passed_total + known_good_failed_total + known_bad_passed_total + known_bad_failed_total)
-{% endhighlight %}
+</pre>

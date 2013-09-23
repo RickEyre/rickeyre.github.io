@@ -14,11 +14,11 @@ published: true
 
 <h3>Squashing Code is Nice</h3>
 
-<p>So I have successfully squashed the node and cuetext token data code and it's worked out nicely. This reduces the overall amount of code that needs to be written and the complexity of the code that needs to be written to access those structs. Heres what they look like now:</p>
+<p>So I have successfully squashed the node and cuetext token data code and it's worked out nicely. This reduces the overall amount of code that needs to be written and the complexity of the code that needs to be written to access those structs. Here's what they look like now:</p>
 
 <p>Token:</p>
 
-{% highlight c %}
+<pre class="prettyprint">
 struct
 webvtt_cuetext_token_t {
   webvtt_cuetext_token_type token_type;
@@ -39,11 +39,11 @@ webvtt_cuetext_start_token_data_t {
   webvtt_string_list *css_classes;
   webvtt_string annotations;
 };
-{% endhighlight %}
+</pre>
 
 <p>Node:</p>
 
-{% highlight c %}
+<pre class="prettyprint">
 struct
 webvtt_node_t {
   /**
@@ -69,13 +69,13 @@ webvtt_internal_node_data_t {
   webvtt_uint length;
   webvtt_node **children;
 };
-{% endhighlight %}
+</pre>
 
 <p>Here is one example how it simplifies the code:</p>
 
 <p>Before:</p>
 
-{% highlight c %}
+<pre class="prettyprint">
 if( webvtt_create_node_from_token( token_ptr, &amp;temp_node_ptr, current_node_ptr ) != WEBVTT_SUCCESS )
   /* Do something here? */
   continue;
@@ -86,11 +86,11 @@ if( webvtt_create_node_from_token( token_ptr, &amp;temp_node_ptr, current_node_p
     current_node_ptr = temp_node_ptr;
   }
 }
-{% endhighlight %}
+</pre>
 
 <p>After:</p>
 
-{% highlight c %}
+<pre class="prettyprint">
 if( webvtt_create_node_from_token( token, &amp;temp_node, current_node ) != WEBVTT_SUCCESS )
   /* Do something here? */
   { continue; }
@@ -101,11 +101,11 @@ if( webvtt_create_node_from_token( token, &amp;temp_node, current_node ) != WEBV
       }
   }
 }
-{% endhighlight %}
+</pre>
 
 <h3>Tokens vs Nodes</h3>
 
-<p>In my last blog post about refactoring the parser I talked about removing the token stuff and instead just using webvtt_node straight away. I haven't done that yet because I have discovered a problem with it. The problem is that tokens have a way of representing an end tag
+<p>In my last blog post about refactoring the parser I talked about removing the token stuff and instead just using <code>webvtt_node</code> straight away. I haven't done that yet because I have discovered a problem with it. The problem is that tokens have a way of representing an end tag
 whereas nodes do not. This is important because when the tokenizer returns an end tag token a new node is not instantiated, instead the current node will change to the current nodes parent. Therefore, since a node has no idea of what an end tag is it cannot replace a token... yet.
 I'm still not convinced that we can't do this in some way.</p>
 
@@ -116,7 +116,7 @@ I'm still not convinced that we can't do this in some way.</p>
 
 <ol>
 	<li>It's more clear as to what is actually going on.</li>
-	<li>I was typedef-ing pointers as a [object]_ptr. So if I instead just use pointer notation it will decrease the character count everywhere. Instead of [object]_ptr everywhere we will just have *[object].</li>
+	<li>I was typedef-ing pointers as a <code>[object]_ptr</code>. So if I instead just use pointer notation it will decrease the character count everywhere. Instead of <code>[object]_ptr</code> everywhere we will just have <code>*[object]</code>.</li>
 </ol>
 
 <h3>Memory Leaks in C++ Bindings</h3>

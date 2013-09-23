@@ -1,0 +1,52 @@
+---
+layout: post
+title: DOM Tests Landed -- Finally!
+tags:
+- mozilla
+- seneca college
+- open-source
+- cdot
+---
+
+<p>Finally, we have landed the <a href="https://bugzilla.mozilla.org/833386">DOM tests</a>!
+We've been working on them for a long time and it's taken a long time to sort
+out all the issues we've had. We had a few major problems after we got the tests
+ready to start being reviewed.</p>
+
+<p>The first was that for tests that deal with cues we have to wait for them to be
+loaded before starting the test. What we thought this entailed initially was
+listenining for the <code>MediaElement's</code> <code>loadedmetadata</code> event as
+<a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#event-media-loadedmetadata">in the spec</a>
+this is where it says the cues *should* be loaded. We quickly discovered this
+isn't the case as we haven't implemented the bits that deal with that for WebVTT.
+What we ended up doing was to
+<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=882535">implement the HTMLTrackElement's ReadyState</a>.
+The <code>ReadyState</code> basically tells if the track is loading, loaded, or errored.
+After implementing that it was easy enough to hook the cue test into it by
+re-queueing the test until the state is set to loaded.</p>
+
+<p>The other major problem was that we were failing on debug builds as we were
+getting an assertion that the <code>HTMLTrackElement</code> wasn't a <code>DOMWindow</code> or <code>DOMNode</code>...
+which is basically impossible. The problem was that we were doing
+<code>HTMLTrackElement's</code> Query Interface implementation wrong. We got that
+<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=882817">sorted out fairly quickly</a>.</p>
+
+<p>The last and most troublesome <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=884884">bug</a>
+we had was that cue tests were failing on Android builds. This was weird because
+when you run Nightly on Android you see subtitles. It took a while to fix this
+too because Firefox's build system was broken on the newest Android SDK and Java
+Development Kit. There was a workaround, but I never got it to work. What we
+ended up doing in the meantime was to split out the tests that don't deal with
+cues and land those. So we made some progress. Eventually on a hunch I did a
+try-push to test whether or not <code>loadedmetadata</code> was being called (we were still
+using this on top of the <code>HTMLTrackElement::ReadyState</code> stuff) and, voila, there
+was the problem. Talking to <a href="http://blog.pearce.org.nz/search/label/mozilla">Chris Pearce</a>,
+it turns out that on Android they set preload=none to limit data usage. The
+solution was to either remove the <code>loadedmetadata</code> stuff and just use the
+<code>ReadyState</code> bits or add <code>preload=auto</code> on the Media Element. I just ended up
+removing  the <code>loadedmetadata</code> stuff.</p>
+
+<p>I did eventually get an Android debug build going on my Nexus 7, but I'm still
+unable to run Mochitests on it...</p>
+
+<p>Until next time.</p>

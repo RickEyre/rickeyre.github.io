@@ -12,14 +12,14 @@ published: true
 <p>For the 0.2 release the Professor got us to each sign up on different aspects of the development process. We could choose from many different categories:</p>
 
 <ul>
-	<li>Documentation</li>
-	<li>Testing</li>
-	<li>Solving Bugs in other WebVTT projects such as the online <a href="http://quuz.org/webvtt/">JS Web Validator</a> or the C++ implementation in <a href="https://github.com/WebKit/webkit/tree/master/Source/WebCore/html/track">WebKit</a></li>
-	<li>Turning the JS Validator into a full blown JS Parser in order to be able to use that instead of the C parser on browsers that are to old to support the track element like IE8</li>
-	<li>Writing the C Parser</li>
-	<li>Fuzz testing</li>
-	<li>Maintaining the Build System</li>
-	<li>Continuous Integration (the process of compiling and running the build on every commit to GitHub in order to know if a commit has broken the code)</li>
+  <li>Documentation</li>
+  <li>Testing</li>
+  <li>Solving Bugs in other WebVTT projects such as the online <a href="http://quuz.org/webvtt/">JS Web Validator</a> or the C++ implementation in <a href="https://github.com/WebKit/webkit/tree/master/Source/WebCore/html/track">WebKit</a></li>
+  <li>Turning the JS Validator into a full blown JS Parser in order to be able to use that instead of the C parser on browsers that are to old to support the track element like IE8</li>
+  <li>Writing the C Parser</li>
+  <li>Fuzz testing</li>
+  <li>Maintaining the Build System</li>
+  <li>Continuous Integration (the process of compiling and running the build on every commit to GitHub in order to know if a commit has broken the code)</li>
 </ul>
 
 <p>I chose to sign up for writing the C parser and also creating and maintaining the build system. Currently we have three teams of two people working on three separate implementations of the C parser. We are doing this in order to adhere to the design philosophy of 'write two and plan to throw one away'. When our 0.2 release lands we will go about selecting the best parts of each and integrating them into the real C parser that we will be releasing in the end.
@@ -28,69 +28,69 @@ published: true
 
 <p>We started talking about this to class mates and we were trying to figure out ways to turn C into OO, but as soon as the Prof heard of this he told us - "When in C do as the Cs do". Which makes sense. You want to use the language as the way it was intended, otherwise we should just use C++. I know there are some ways you can work around Cs lack of OO to get a general approximation, but these are all clunky and generally obfuscate the code in my opinion.</p>
 
-<p>So we set out on trying to find a way to retain Cs lack of OO while generally conforming to an approximation of the specification. What we decided on doing was creating a kind of inheritance structure with structs by having a container struct that contains a void pointer, which points to the concrete struct, and an enumeration that identifies what that concrete struct is. This way the enumeration tells you what you must cast the void pointer too in order to get the appropriate data. The <a href="http://dev.w3.org/html5/webvtt/#webvtt-node-object">data structure</a> that the WebVTT specification asks for is a tree. InternalNodes that can contain other InternalNodes and LeafNodes which are terminal nodes i.e. those which cannot contain other nodes.</p>
+<p>So we set out on trying to find a way to retain Cs lack of OO while generally conforming to an approximation of the specification. What we decided on doing was creating a kind of inheritance structure with structs by having a container struct that contains a void pointer, which points to the concrete struct, and an enumeration that identifies what that concrete struct is. This way the enumeration tells you what you must cast the void pointer too in order to get the appropriate data. The <a href="http://dev.w3.org/html5/webvtt/#webvtt-node-object">data structure</a> that the WebVTT specification asks for is a tree. <code>InternalNodes</code> that can contain other <code>InternalNodes</code> and <code>LeafNodes</code> which are terminal nodes i.e. those which cannot contain other nodes.</p>
 
 <p>Here is an example of what we came up with:</p>
 
-{% highlight c linenos=table %}
+<pre class="prettyprint">
 struct Node
 {
-	int mode;
-	union
-	{
-		struct InternalNode *internalNode;
-		struct LeafNode *leafNode;
-	};
+  int mode;
+  union
+  {
+    struct InternalNode *internalNode;
+    struct LeafNode *leafNode;
+  };
 };
 
 struct InternalNode
 {
-	struct Node *nodes;
+  struct Node *nodes;
 
-	enum InternalNodeType internalNodeType;
-	void *concreteNode;
+  enum InternalNodeType internalNodeType;
+  void *concreteNode;
 };
 
 struct LeafNode
 {
-	enum LeafNodeType leafNodeType;
-	void *concreteNode;
+  enum LeafNodeType leafNodeType;
+  void *concreteNode;
 };
-{% endhighlight %}
+</pre>
 
-<p>The Node class is the base which can either be an implementation of LeafNode or InternalNode. Both of those implementations contain a void pointer and an enumeration that specifies what kind of struct the void pointer is. For example the InternalNode enumeration might be Bold, Italic, etc. The InternalNode class also has a list of Node structs that contains the nodes nested within it.</p>
+<p>The Node class is the base which can either be an implementation of <code>LeafNode</code> or <code>InternalNode</code>. Both of those implementations contain a void pointer and an enumeration that specifies what kind of struct the void pointer is. For example the <code>InternalNode</code> enumeration might be Bold, Italic, etc. The <code>InternalNode</code> class also has a list of Node structs that contains the nodes nested within it.</p>
 
 <p>In this way if we wanted to render a Bold WebVTT cue text we would (in pseudocode):</p>
 
-{% highlight c linenos=table %}
+<pre class="prettyprint">
 if (mode == 1)
 {
-	switch (node->internalNode->internalNodeType)
-	{
-		case Bold:
-			RenderBold((struct BoldNode)node->internalNode->concreteNode);
-	}
+  switch (node->internalNode->internalNodeType)
+  {
+    case Bold:
+      RenderBold((struct BoldNode)node->internalNode->concreteNode);
+  }
 }
-{% endhighlight %}
+</pre>
 
 <p>I don't know if this is the easiest, or best way of doing this, but I guess that's what learning is for!</p>
 
-<p>One of the other interesting things that we have implemented is a struct called WebVttBufferInfo that keeps track of the buffer information of the WebVTT file. That looks like this so far:</p>
+<p>One of the other interesting things that we have implemented is a struct called <code>WebVttBufferInfo</code> that keeps track of the buffer information of the WebVTT file. That looks like this so far:</p>
 
-{% highlight c linenos=table %}
+<pre class="prettyprint">
 struct WebVttBufferInfo
 {
-	// Will hold the input buffer
-	char *inputBuffer;
-	// Pointer into input buffer that denotes the current position
-	char *position;
-	// Represents a line that has been collected from the input buffer i.e. from beginning of
-	// line until CR(LF)
-	char *currentLine;
+  // Will hold the input buffer
+  char *inputBuffer;
+  // Pointer into input buffer that denotes the current position
+  char *position;
+  // Represents a line that has been collected from the input buffer i.e. from beginning of
+  // line until CR(LF)
+  char *currentLine;
 
-	enum WebVttBufferInfoState state;
+  enum WebVttBufferInfoState state;
 };
-{% endhighlight %}
+</pre>
 
 <p>If you want to check out the work done so far you can go <a href="https://github.com/RickEyre/webvtt/tree/c-parser/webvtt-parser-new">here</a>.</p>
 
@@ -99,9 +99,9 @@ struct WebVttBufferInfo
 <p>I do know that for the build system we will need to:</p>
 
 <ul>
-	<li>Create an auto configure file to check and configure our build environment before we build</li>
-	<li>Make the build environment capable of cross platform development - Linux, OSX, and Windows</li>
-	<li>There are also some bugs that I need to take care of having to do with correct test failure and pass counting</li>
+  <li>Create an auto configure file to check and configure our build environment before we build</li>
+  <li>Make the build environment capable of cross platform development - Linux, OSX, and Windows</li>
+  <li>There are also some bugs that I need to take care of having to do with correct test failure and pass counting</li>
 </ul>
 
 <p>We got a lot ahead of ourselves. The 0.2 release is due on Oct 29, so I have to get back to work!!</p>

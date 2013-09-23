@@ -14,9 +14,9 @@ published: true
 
 <ul>
 	<li>Integrating the webvtt build system into the Firefox build system.</li>
-	<li>Adding a captions div to an nsVideoFrame so the captions can be rendered on screen.</li>
+	<li>Adding a captions div to an <code>nsVideoFrame</code> so the captions can be rendered on screen.</li>
 	<li>Creating a "Text Track Decoder" that will function as the entry point for Gecko into the webvtt parser.</li>
-	<li>Creating new DOM bindings i.e. TextTrack, TextTrackCue, TextTrackCueList.</li>
+	<li>Creating new DOM bindings i.e. <code>TextTrack</code>, <code>TextTrackCue</code>, <code>TextTrackCueList</code>.</li>
 	<li>Creating DOM tests using Mochitest for the new DOM bindings.</li>
 </ul>
 
@@ -28,11 +28,11 @@ published: true
 
 <h2>Firefox Integration</h2>
 
-<p>I've been working on the Text Track Decoder for the parser integration into Firefox. This part of the integration functions as an entry point into our parser for Gecko.</p>
+<p>I've been working on the <code>Text Track Decoder</code> for the parser integration into Firefox. This part of the integration functions as an entry point into our parser for Gecko.</p>
 
 <h2>How It Works</h2>
 
-<p>The short version of how the Text Track Decoder works is that when an <a href="https://github.com/RickEyre/mozilla-central/blob/text-track-decoder/content/html/content/src/HTMLTrackElement.cpp">HtmlTrackElement</a> receives new data from a vtt byte stream it passes it off to it's <a href="https://github.com/RickEyre/mozilla-central/blob/text-track-decoder/content/html/content/src/WebVTTLoadListener.cpp">WebVTTLoadListener</a> (Text Track Decoder) which then calls our webvtt parser to parse the chunk of the byte stream it just reveived. The WebVTTLoadListener also provides call back functions to the parser for passing back cues when the parser has finished them or for reporting errors when the parser encounters them. The final function that the WebVTTLoadListener facilitates is converting the cues that have been passed back in the call back function to the various DOM elements that represent a webvtt_cue and then attaching those to either the HtmlTrackElement's track, in the case of the cue settings, or the HtmlTrackElement's MediaElement's video div caption overlay (phew), in the case of the parsed webvtt cue text node tree.</p>
+<p>The short version of how the <code>Text Track Decoder</code> works is that when an <a href="https://github.com/RickEyre/mozilla-central/blob/text-track-decoder/content/html/content/src/HTMLTrackElement.cpp">HtmlTrackElement</a> receives new data from a vtt byte stream it passes it off to it's <a href="https://github.com/RickEyre/mozilla-central/blob/text-track-decoder/content/html/content/src/WebVTTLoadListener.cpp">WebVTTLoadListener</a> (Text Track Decoder) which then calls our webvtt parser to parse the chunk of the byte stream it just reveived. The <code>WebVTTLoadListener</code> also provides call back functions to the parser for passing back cues when the parser has finished them or for reporting errors when the parser encounters them. The final function that the <code>WebVTTLoadListener</code> facilitates is converting the cues that have been passed back in the call back function to the various DOM elements that represent a webvtt_cue and then attaching those to either the <code>HtmlTrackElement's</code> track, in the case of the cue settings, or the <code>HtmlTrackElement's MediaElement's</code> video div caption overlay (phew), in the case of the parsed webvtt cue text node tree.</p>
 
 <h2>What We've Done</h2>
 
@@ -41,25 +41,25 @@ published: true
 <p>We then quickly went about implementing Chris's initial steps that he talked about. We've done steps 1 - 4 so far:</p>
 
 <ul>
-	<li>The HtmlTrackElement::LoadListener has been moved to it's own file and renamed WebVTTLoadListener.</li>
-	<li>The HtmlTrackElement now has a WebVTTLoadListener reference which is initialized in LoadResource.</li>
-	<li>WebVTTLoadListener now manages a single webvtt parser which is created and destroyed along with it.</li>
-	<li>WebVTTLoadListener now provides call back functions to the parser for returning finished cues and reporting errors.</li>
+	<li>The <code>HtmlTrackElement::LoadListener</code> has been moved to it's own file and renamed <code>WebVTTLoadListener</code>.</li>
+	<li>The <code>HtmlTrackElement</code> now has a <code>WebVTTLoadListener</code> reference which is initialized in <code>LoadResource</code>.</li>
+	<li><code>WebVTTLoadListener</code> now manages a single webvtt parser which is created and destroyed along with it.</li>
+	<li><code>WebVTTLoadListener</code> now provides call back functions to the parser for returning finished cues and reporting errors.</li>
 </ul>
 
 <p>We've also added three convenience functions to turn webvtt cue stuff into the DOM bindings. These are:</p>
 
 <ul>
-	<li ><a href="https://github.com/RickEyre/mozilla-central/blob/text-track-decoder/content/html/content/src/WebVTTLoadListener.cpp#L65">cCueToDomCue</a> - Transforms a webvtt cue's settings into a TextTrackCue <strong>(almost done)</strong>.</li>
-	<li ><a href="https://github.com/RickEyre/mozilla-central/blob/text-track-decoder/content/html/content/src/WebVTTLoadListener.cpp#L103">cNodeToHtmlElement</a> -  Transforms a webvtt node into an HtmlElement; recursively adds HtmlElements to it's children if it is converting an internal webvtt node <strong>(not done at all!)</strong>.</li>
-	<li ><a href="https://github.com/RickEyre/mozilla-central/blob/text-track-decoder/content/html/content/src/WebVTTLoadListener.cpp#L87">cNodeListToDocumentFragment</a> - Transforms the head node's children into HtmlElements and adds them to a DocumentFragment <strong>(pretty much done)</strong>.</li>
+	<li ><a href="https://github.com/RickEyre/mozilla-central/blob/text-track-decoder/content/html/content/src/WebVTTLoadListener.cpp#L65">cCueToDomCue</a> - Transforms a webvtt cue's settings into a <code>TextTrackCue</code> <strong>(almost done)</strong>.</li>
+	<li ><a href="https://github.com/RickEyre/mozilla-central/blob/text-track-decoder/content/html/content/src/WebVTTLoadListener.cpp#L103">cNodeToHtmlElement</a> -  Transforms a webvtt node into an <code>HtmlElement</code>; recursively adds <code>HtmlElements</code> to it's children if it is converting an internal webvtt node <strong>(not done at all!)</strong>.</li>
+	<li ><a href="https://github.com/RickEyre/mozilla-central/blob/text-track-decoder/content/html/content/src/WebVTTLoadListener.cpp#L87">cNodeListToDocumentFragment</a> - Transforms the head node's children into <code>HtmlElements</code> and adds them to a <code>DocumentFragment</code> <strong>(pretty much done)</strong>.</li>
 </ul>
 
 <p>The call back function for returning cues now:</p>
 
 <ul>
-	<li >Calls the cCueToDomCue function and adds the resulting HtmlTextTrackCue to it's owning HtmlTrackElements cue list.</li>
-	<li >Calls the cNodeListToDocumentFragment and adds the resulting DocumentFragment to the caption overlay.</li>
+	<li >Calls the <code>cCueToDomCue</code> function and adds the resulting <code>HtmlTextTrackCue</code> to it's owning <code>HtmlTrackElements</code> cue list.</li>
+	<li >Calls the <code>cNodeListToDocumentFragment</code> and adds the resulting <code>DocumentFragment</code> to the caption overlay.</li>
 </ul>
 
 <p >Right now we've run into some problems in figuring out how to work with the Firefox code. I've listed those in my recent <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=833382#c3">WIP update</a> on the bug. Other then implementing those steps I've just been getting acquainted with the Firefox code that we have to touch and figuring out the basics of how it's all going to fit in. I think we've gotten a big chunk of it done so far, mostly the overall frame of how it's going to work as well as turning a webvtt cue's settings into a TextTrackCue. I've also met the deadlines and goals that I set for <a href="/2013/01/10/webvtt-in-2013.html">myself</a> at the beginning of this semester, so I'm fairly happy. Going forward I think I know enough now to ask intelligent questions about how to solve the problems that I listed in the WIP, so that's what I will be doing in the coming weeks when I get stuck.</p>

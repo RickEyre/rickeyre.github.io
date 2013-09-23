@@ -21,42 +21,41 @@ published: true
 	<li>Since all the data is now in one struct and is not referenced by a void * we can easily see the data in real time when debugging. When it's a void * you can't see what the data is inside when debugging in real time.</li>
 </ul>
 
-{% highlight c %}
+<pre class="prettyprint">
 struct
 webvtt_cuetext_tag_t
 {
-	/**
-	 * The specification asks for uni directional linked list, but we have added a parent
-	 * in order to facilitate an iterative cue text parsing solution.
-	 */
-	webvtt_cuetext_tag *parent;
-	webvtt_cuetext_tag_kind kind;
+  /**
+   * The specification asks for uni directional linked list, but we have added a parent
+   * in order to facilitate an iterative cue text parsing solution.
+   */
+  webvtt_cuetext_tag *parent;
+  webvtt_cuetext_tag_kind kind;
 
-	/**
-	 * This union will hold either an internal cue text tag data struct represeting the internal data of an internal cue text tag
-	 * data type, a bytearray representing the text of a text cue text type, or a time stamp representing the time stamp of
-	 * a time stamp cue text tag.
-	 */
-	union
-	{
-		webvtt_internal_cuetext_tag_data *internal_cuetext_tag_data;
-		webvtt_bytearray text;
-		webvtt_timestamp time_stamp;
-	};
-
+  /**
+   * This union will hold either an internal cue text tag data struct represeting the internal data of an internal cue text tag
+   * data type, a bytearray representing the text of a text cue text type, or a time stamp representing the time stamp of
+   * a time stamp cue text tag.
+   */
+  union
+  {
+    webvtt_internal_cuetext_tag_data *internal_cuetext_tag_data;
+    webvtt_bytearray text;
+    webvtt_timestamp time_stamp;
+  };
 };
 
 struct
 webvtt_internal_cuetext_tag_data_t
 {
-	webvtt_string annotation;
-	webvtt_bytearray_list *css_class_list;
+  webvtt_string annotation;
+  webvtt_bytearray_list *css_class_list;
 
-	webvtt_uint alloc;
-	webvtt_uint length;
-	webvtt_cuetext_tag *children;
+  webvtt_uint alloc;
+  webvtt_uint length;
+  webvtt_cuetext_tag *children;
 };
-{% endhighlight %}
+</pre>
 
 <p>In accordance with this I've renamed everything having to do with Nodes to cuetext_tag.</p>
 
@@ -70,19 +69,19 @@ webvtt_internal_cuetext_tag_data_t
 	<li>If we really want the output of the parser to be something else other then UTF8 then we can convert it before we output/make available the parsed WEBVTT file.</li>
 </ul>
 
-<p>Another thing we'll need to do is make a string list for the webvtt_bytearray (what we are using to handle UTF8) just like we did for the UTF16 stuff so that the cue text parser can store a list of CSS classes that have been applied to a cue text tag.</p>
+<p>Another thing we'll need to do is make a string list for the <code>webvtt_bytearray</code> (what we are using to handle UTF8) just like we did for the UTF16 stuff so that the cue text parser can store a list of CSS classes that have been applied to a cue text tag.</p>
 
 <p><h3>Other Parser Things</h3></p>
 
-<p>The other thing that I will be doing for sure are getting rid of the token structs in the cue text parser. Right now the cue text parser calls a tokenizer which creates a token that has basically the same data and structure as a node (cuetext_tag now). This token then gets mapped over to a particular cuetext_tag. This is how the WEBVTT algorithm wanted it, but I don't really see the point if we are just going to translate it. So I'm going to take the tokens out and instead instantiate cuetext_tags straight away instead of going through a token struct first.</p>
+<p>The other thing that I will be doing for sure are getting rid of the token structs in the cue text parser. Right now the cue text parser calls a tokenizer which creates a token that has basically the same data and structure as a node (<code>cuetext_tag</code> now). This token then gets mapped over to a particular <code>cuetext_tag</code>. This is how the WEBVTT algorithm wanted it, but I don't really see the point if we are just going to translate it. So I'm going to take the tokens out and instead instantiate <code>cuetext_tags</code> straight away instead of going through a token struct first.</p>
 
 <p><h3>C++ Bindings</h3></p>
 
-<p>So we've been having a lot of memory leak problems with the Node C++ bindings (soon to be cuetext_tag bindings). I've thought about it and what I would suggest doing is to loop through the entire tree of cuetext_tags upon the instantiation of the cue which owns them and create a cue text tag for each one of them.</p>
+<p>So we've been having a lot of memory leak problems with the Node C++ bindings (soon to be <code>cuetext_tag</code> bindings). I've thought about it and what I would suggest doing is to loop through the entire tree of cuetext_tags upon the instantiation of the cue which owns them and create a cue text tag for each one of them.</p>
 
-<p>Then when we call child() in the Unit Tests we won't be allocating any new memory, we'd just be retrieving the already created C++ cuetext_tag.</p>
+<p>Then when we call <code>child()</code> in the Unit Tests we won't be allocating any new memory, we'd just be retrieving the already created C++ <code>cuetext_tag</code>.</p>
 
-<p>Then since cue knows about it's tree of cuetext_tags it can start a cascading delete on the entire tree of cuetext_tags when it's destructor is called.</p>
+<p>Then since cue knows about it's tree of <code>cuetext_tags</code> it can start a cascading delete on the entire tree of cuetext_tags when it's destructor is called.</p>
 
 <p>Voila, no more memory leaks.</p>
 

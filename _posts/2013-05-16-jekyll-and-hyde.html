@@ -13,38 +13,38 @@ published: true
 
 <p>Installing the basic setup that you need to start writing blogs with Jekyll was super easy. Just install Ruby and RubyGems with MacPorts (if your on Mac) and install Jekyll with RubyGems.</p>
 
-{% highlight bash %}
+<pre class="prettyprint">
 sudo port install ruby
 sudo port install rb-rubygems
 sudo gem install jekyll
-{% endhighlight %}
+</pre>
 
-<p>My real troubles began when I tried to use Jekyll's blog import tool to migrate my Wordpress posts over to my new blog. To do this you need the jekyll-import command. For the longest time I was having trouble installing this because 'jekyll-import' isn't a full out gem yet (according to official documentation it is...) it's a beta gem. This means you have to install it using the --pre option.</p>
+<p>My real troubles began when I tried to use Jekyll's blog import tool to migrate my Wordpress posts over to my new blog. To do this you need the <code>jekyll-import</code> command. For the longest time I was having trouble installing this because <code>jekyll-import</code> isn't a full out gem yet (according to official documentation it is...) it's a beta gem. This means you have to install it using the <code>--pre</code> option.</p>
 
-{% highlight bash %}
+<pre class="prettyprint">
 sudo gem install jekyll-import --pre
-{% endhighlight %}
+</pre>
 
 <p>Without this it will tell you it "can't find the gem 'jekyll-import'", but that you "may have been looking to install the gem jekyll-import'"... confusing, I know.</p>
 
-<p>Great! Now it could find the gem when I went to install it. However now I had a new problem -- it couldn't find libiconv. This was weird because I had installed libiconv with MacPorts. It was only until I went to check the mkmf.log that the gem had created that I realized what had been happening (previously I had just been relying on what was being spit out on the command line, like a noob). In the log I found out that the libiconv I had wasn't the architecture that was needed. I had x86_64, but I needed i386. Solving this was super easy. Just install the port variant of the libiconv library that is a universal library, i.e. you can use it when compiling for i386 and x86_64.</p>
+<p>Great! Now it could find the gem when I went to install it. However now I had a new problem&mdash;it couldn't find <code>libiconv</code>. This was weird because I had installed <code>libiconv</code> with MacPorts. It was only until I went to check the mkmf.log that the gem had created that I realized what had been happening (previously I had just been relying on what was being spit out on the command line, like a noob). In the log I found out that the libiconv I had wasn't the architecture that was needed. I had x86_64, but I needed i386. Solving this was super easy. Just install the port variant of the <code>libiconv</code> library that is a universal library, i.e. you can use it when compiling for i386 and x86_64.</p>
 
-{% highlight bash %}
+<pre class="prettyprint">
 sudo port install libiconv +universal
-{% endhighlight %}
+</pre>
 
-<p>The last problem I had with installing after this was getting the correct kind version of ruby. Jekyll-import needs ruby 2.0, I had 1.92. I had difficulty setting this up as I had multiple versions on my Mac including one that shipped with OS X. What you need to do is to install the ruby 2.0 port and then activate it.</p>
+<p>The last problem I had with installing after this was getting the correct kind version of ruby. <code>Jekyll-import</code> needs ruby 2.0, I had 1.92. I had difficulty setting this up as I had multiple versions on my Mac including one that shipped with OS X. What you need to do is to install the ruby 2.0 port and then activate it.</p>
 
-{% highlight bash %}
+<pre class="prettyprint">
 sudo port install ruby20
 sudo port select --list ruby (to get all ruby versions)
 sudo port select ruby ruby20 (to select ruby 2.0)
-{% endhighlight %}
+</pre>
 
-<p>Finally, jekyll-import installed and I tried to migrate my Wordpress blog posts. I ran into one more problem though and this turned out to be a real bug. The import command was incorrectly trying to interpret the input of the command line arguments as a string instead of as a hash, which was what it needed. I filed the <a href="https://github.com/jekyll/jekyll-import/issues/23">bug</a> on the project's GitHub page and someone solved it quickly! I haven't had time to check to see if the gem has been updated yet so I don't know if it's completely working yet. Will post back when I find out.</p>
+<p>Finally, <code>jekyll-import</code> installed and I tried to migrate my Wordpress blog posts. I ran into one more problem though and this turned out to be a real bug. The import command was incorrectly trying to interpret the input of the command line arguments as a string instead of as a hash, which was what it needed. I filed the <a href="https://github.com/jekyll/jekyll-import/issues/23">bug</a> on the project's GitHub page and someone solved it quickly! I haven't had time to check to see if the gem has been updated yet so I don't know if it's completely working yet. Will post back when I find out.</p>
 
 <p>So the moral of the story here is <strong><em>always</em></strong><em> </em>check the log file when you encounter problems. It's happened to me before where the log file has the correct information and the command line isn't very helpful. Doing this will save you tons of time.</p>
 
-<p>After all that I decided to set up my new blog with at least a 'coming soon' sign. So it's up! You can check it out <a href="http://rickeyre.github.io">here</a>. All that's left is to finish my blog migration and add cool things like comment tracking and twitter feeds. I'd also like the user to be able to change the theme in real time. That would be cool. I also got to get some DNS server hosting for my brand spanking new domain http://rickeyre.ca. After that all will be good.</p>
+<p>After all that I decided to set up my new blog with at least a 'coming soon' sign. So it's up! You can check it out <a href="http://rickeyre.github.io">here</a>. All that's left is to finish my blog migration and add cool things like comment tracking and twitter feeds. I'd also like the user to be able to change the theme in real time. That would be cool. I also got to get some DNS server hosting for my brand spanking new domain <a href="http://rickeyre.ca">rickeyre.ca</a>. After that all will be good.</p>
 
 <p>Until next time.</p>

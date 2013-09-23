@@ -14,11 +14,11 @@ published: true
 <p>We presented our <a href="/2012/10/18/webvtt-0-2-release-update.html">initial code</a> and development to our class last Thursday and we got quite a few good comments on how to improve the code, all of which we later implemented:</p>
 
 <ul>
-	<li>Change the naming conventions we were using to more C style naming conventions. At the time we were using camel case to name our variables but this is not the way you do it in C. In C you usually name your variable and function names all lower case with _ to separate words.</li>
-	<li>Change some while loops that we had that could be changed into for loops and simplified.</li>
-	<li>Change our error logging system to be contained within our WebVTT buffer info struct instead of as a global variable.</li>
-	<li>Change one function that we used to advance a pointer past a single line ending to advance past any number of line endings that might occur.</li>
-	<li>Change our error logging code to be able to take in a -debug command on the command line in order to tell the program whether or not it needs to log errors.</li>
+  <li>Change the naming conventions we were using to more C style naming conventions. At the time we were using camel case to name our variables but this is not the way you do it in C. In C you usually name your variable and function names all lower case with _ to separate words.</li>
+  <li>Change some while loops that we had that could be changed into for loops and simplified.</li>
+  <li>Change our error logging system to be contained within our WebVTT buffer info struct instead of as a global variable.</li>
+  <li>Change one function that we used to advance a pointer past a single line ending to advance past any number of line endings that might occur.</li>
+  <li>Change our error logging code to be able to take in a -debug command on the command line in order to tell the program whether or not it needs to log errors.</li>
 </ul>
 
 <p>The class was also really good because it got me thinking of all the things that we would need to be thinking about for our final implementation, such as the program being <a href="http://en.wikipedia.org/wiki/UTF-8">UTF-8</a> compliant. The Prof pointed out to us certain functions that we were using, such as many C string functions, which would not behave the way we would want when using UTF-8.</p>
@@ -32,19 +32,19 @@ published: true
 <p>The most interesting thing I did this week was to begin to work on a UTF-8 library that we can rely on for our C parser. To give you an overview of UTF-8:</p>
 
 <ul>
-	<li>UTF-8 'characters' are called code points.</li>
-	<li>Each code point consists of a variable amount of bytes.</li>
-	<li>UTF-8 code points consist of one leading byte and a variable amount of continuation bytes.</li>
-	<li>A UTF-8 leading byte has two or more high order ones followed by a zero.</li>
-	<li>A UTF-8 continuation byte has one high order ones followed by a zero.</li>
-	<li>The amount of high order ones in a leading byte denotes how many continuation bytes there should be in the code point.</li>
+  <li>UTF-8 'characters' are called code points.</li>
+  <li>Each code point consists of a variable amount of bytes.</li>
+  <li>UTF-8 code points consist of one leading byte and a variable amount of continuation bytes.</li>
+  <li>A UTF-8 leading byte has two or more high order ones followed by a zero.</li>
+  <li>A UTF-8 continuation byte has one high order ones followed by a zero.</li>
+  <li>The amount of high order ones in a leading byte denotes how many continuation bytes there should be in the code point.</li>
 </ul>
 
 <p>For more information you can checkout <a href="http://en.wikipedia.org/wiki/UTF-8#Description">this</a>.</p>
 
 <p>The bulk of the UTF-8 code that I wrote for the library is within one function:</p>
 
-{% highlight c %}
+<pre class="prettyprint">
 int is_utf8_code_point(char *s) {
   int i, required_number_of_bytes = 0;
   /* These variables hold the values that allow the program to check if the first byte of a UTF8 code point conforms to the specification. */
@@ -88,22 +88,22 @@ int is_utf8_code_point(char *s) {
 
   return required_number_of_bytes;
 }
-{% endhighlight %}
+</pre>
 
 <p>The function determines if the passed char array contains a UTF-8 code point. It assumes that the first char pointed to is the leading byte. It will then do a series of & operations on the leading byte to determine if it has the proper amount of high order bits and zeros. If it finds a match it will then loop through the continuation bytes to see if the amount of continuation bytes that the leading byte requires is met.</p>
 
 <p>Some things to note:</p>
 
 <ul>
-	<li>This code is completely untested right now. I have no idea if it is completely correct or if there are bugs in it. I might get the chance to start working with it before Monday.</li>
-	<li>I don't know if this is the most efficient way to check for a code point. When it looks for a proper leading byte it starts by comparing the highest number of high bits that a leading byte could have and then proceeds to bit shift left until a match is found or it gets to the lowest amount possible. I was thinking that it might be better to start at the lowest amount of high order bits and then checking the next highest, but this would take more arithmetic then a simple bit shift.</li>
+  <li>This code is completely untested right now. I have no idea if it is completely correct or if there are bugs in it. I might get the chance to start working with it before Monday.</li>
+  <li>I don't know if this is the most efficient way to check for a code point. When it looks for a proper leading byte it starts by comparing the highest number of high bits that a leading byte could have and then proceeds to bit shift left until a match is found or it gets to the lowest amount possible. I was thinking that it might be better to start at the lowest amount of high order bits and then checking the next highest, but this would take more arithmetic then a simple bit shift.</li>
 </ul>
 
 <p>Using this function I can do all kinds of things such as:</p>
 
 <p>Calculate the length of a UTF-8 string in code points:</p>
 
-{% highlight c %}
+<pre class="prettyprint">
 int utf8_string_length(char *s) {
   int i;
 
@@ -114,11 +114,11 @@ int utf8_string_length(char *s) {
 
 return i;
 }
-{% endhighlight %}
+</pre>
 
 <p>Check whether or not a string is UTF-8:</p>
 
-{% highlight c %}
+<pre class="prettyprint">
 int string_is_utf8(char *s) {
   while (*s != NULL_BYTE) {
     if (!is_utf8_code_point(s))
@@ -128,11 +128,11 @@ int string_is_utf8(char *s) {
 return 1;
 }
 
-{% endhighlight %}
+</pre>
 
 <p>Retrieve a sub string from a UTF-8 string:</p>
 
-{% highlight c %}
+<pre class="prettyprint">
 int utf8_substring(char *source, char *out, int number_of_code_points) {
   int byte_size = utf8_string_length_in_bytes(source, number_of_code_points);
 
@@ -144,7 +144,7 @@ int utf8_substring(char *source, char *out, int number_of_code_points) {
 
   return 1;
 }
-{% endhighlight %}
+</pre>
 
 <p>These functions are also untested, hopefully I will get the time to test them soon.</p>
 

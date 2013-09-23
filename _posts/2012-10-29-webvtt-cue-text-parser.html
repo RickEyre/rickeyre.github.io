@@ -34,7 +34,7 @@ published: true
 <p>Anyways, here it is:</p>
 
 <strong> (June 2013) Please note that the code got messed up when transferring my blog. It might not make sense.</strong>
-{% highlight c %}
+<pre class="prettyprint">
 int find_end_tag(text, min_index ,*max_index, expected, *leaf_node) {
 
   for (i = max_index; text[i] != '>' && i > min_index; i++);
@@ -101,4 +101,4 @@ int parse_text(cue) {
     return 0;
   return 1;
 }
-{% endhighlight %}
+</pre>
