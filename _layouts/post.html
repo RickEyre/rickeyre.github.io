@@ -16,8 +16,8 @@
             <h2 class="post-title">
               {{ page.title }}
             </h2>
-              {{ content }}
-            <small class="small-tag-line inline-content">- Tagged in {{ page.tags | array_to_sentence_string }}.</small>
+            {{ content }}
+            <small class="small-tag-line">- Tagged in {{ page.tags | array_to_sentence_string }}.</small>
             <hr/>
             {% include disqus.html %}
             <hr/>

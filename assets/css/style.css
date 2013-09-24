@@ -30,13 +30,25 @@ h1 {
 }
 
 .small-tag-line {
+  clear: left;
+  display: block;
+  padding-top: 2%;
   line-height:1;
   color:#999;
 }
 
 .caption {
+  display: block;
   color:#999;
   font-size: small;
+}
+
+div.image-list > div {
+  float: left;
+}
+
+div.image-list > div, .image {
+  margin: 2%;
 }
 
 .icon {
