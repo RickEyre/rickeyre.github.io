@@ -1,0 +1,69 @@
+---
+layout: post
+date: 2013-09-24 11:00:00 -0400
+title: Gecko and vtt.js
+tags:
+- mozilla
+- seneca college
+- open-source
+- cdot
+---
+
+<p>
+  After three weeks of coding the initial patches and nearly two months of review,
+  <strong>Nightly finally plays basic WebVTT captions again!</strong> If you'd like to see a demo you
+  can head over to my <a href="http://rickeyre.ca/2013/06/20/webvtt-cycle-collector-demo.html">previous blog post</a>
+  where I put together one.
+</p>
+
+<h3>Gecko Integration Setup</h3>
+
+<p>
+  The set up of our integration of <a href="https://github.com/andreasgal/vtt.js">vtt.js</a>
+  into Gecko is fairly simple.
+</p>
+
+<p>
+  First, we have a <a href="https://github.com/mozilla/mozilla-central/blob/6462f0bb0d18a650e217aae1dba1f7549236a712/content/media/webvtt/WebVTTParserWrapper.js">WebVTTParserWrapper</a>
+  that allows us to wrap a <code>vtt.js</code> parser. It implements the <a href="https://github.com/mozilla/mozilla-central/blob/6462f0bb0d18a650e217aae1dba1f7549236a712/content/media/webvtt/nsIWebVTTParserWrapper.idl">nsIWebVTTParserWrapper IDL</a>
+  which allows us to work with the <code>WebVTTParserWrapper</code> (that was implemented in JS) in C++.
+</p>
+
+<p>
+  Secondly, we have a <a href="https://github.com/mozilla/mozilla-central/blob/6462f0bb0d18a650e217aae1dba1f7549236a712/content/media/WebVTTListener.h">WebVTTListener</a>
+  class which primarily does two things:
+  <ul>
+    <li>Listens to the data stream of an <code>HTMLTrackElement</code> and passes the data to the <code>WebVTTParserWrapper</code> to be parsed.
+    <li>Receives parsed <code>VTTCues</code> and <code>VTTRegions</code> from <code>vtt.js</code> and adds them to the <code>HTMLTrackElement's Track</code>.
+  </ul>
+  Since the <code>WebVTTParserWrapper</code> is written in JS we need to define an IDL that the <code>WebVTTListener</code> class
+  can implement in order to expose its callbacks to JavaScript.
+  The IDL that it implements is the <a href="https://github.com/mozilla/mozilla-central/blob/6462f0bb0d18a650e217aae1dba1f7549236a712/content/media/webvtt/nsIWebVTTListener.idl">nsIWebVTTListener IDL</a>
+  which defines two callbacks that <code>vtt.js</code> needs&mdash;<code>onCue(cue)</code> and
+  <code>onRegion(region)</code>.
+</p>
+
+<p>
+  And that's pretty much it for our current integration of <code>vtt.js</code> into Gecko. Since <code>vtt.js</code>
+  implements the parsing section of WebVTT <em>and</em> the DOM tree construction of rendered subtitles, there
+  is very little we need to add. To get the DOM tree represenation of a <code>cue</code> we can just call 
+  <a href="https://github.com/andreasgal/vtt.js/blob/355f375b6cf04763dcb1843d5683a7c489846425/vtt.js#L433">convertCueToDOMTree()</a>
+  on <code>vtt.js</code>, get the <code>div</code> containing the DOM tree, and add it to the video's caption overlay.
+</p>
+
+<h3>Moving Forward</h3>
+
+<p>
+  The next major step for WebVTT in Gecko is to get what's called the <a href="http://dev.w3.org/html5/webvtt/#processing-model">WebVTT processing model</a>
+  implemented. This is the section of the spec that positions the <code>cue</code> on the video with respect
+  to the <code>cue-settings</code> that have been applied to the <code>cue</code>.
+</p>
+
+<p>
+  Work on that has already begun, and after some major hurdles having to do with the spec being
+  very buggy, <code>vtt.js</code> now applies horizontal or vertical positioning depending on the text orientation of the cue.
+  We've yet to integrate that into Gecko though. We still need to finish the part of the processing model that accounts for
+  overlap avoidance, i.e. positioning <code>cues</code> so that they don't overlap eachother. After that we can start preparing
+  a patch to get that functionality into Gecko.
+</p>
+
