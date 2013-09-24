@@ -11,5 +11,6 @@ layout: default
     </a>
   </h2>
   {{ post.content }}
+  <small class="small-tag-line">- Tagged in {{ post.tags | array_to_sentence_string }}.</small>
   <hr/>
 {% endfor %}
