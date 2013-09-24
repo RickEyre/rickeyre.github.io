@@ -31,13 +31,13 @@ published: true
 
 <p>After this I cloned my mozilla-central fork on GitHub to my computer. Then I fired up the command terminal that simulates a linux environment which comes with the Mozilla Build Package. It can be found at the default directory path:</p>
 
-<blockquote>C:\mozilla-build\start-msvcX
-(where X is the version of VC++ you have)</blockquote>
+<pre class="prettyprint">C:\mozilla-build\start-msvcX
+(where X is the version of VC++ you have)</pre>
 
 <p>After this I navigated to my mozilla-central repository on my computer through the terminal and issued the command to build FireFox:</p>
 
-<blockquote>python build/pymake/make.py -f client.mk -jN
-(where N is the amount of cores you want to use to build it)</blockquote>
+<pre class="prettyprint">python build/pymake/make.py -f client.mk -jN
+(where N is the amount of cores you want to use to build it)</pre>
 
 <p>It crashed immediately.</p>
 
@@ -49,7 +49,7 @@ published: true
 
 <p>For reference this is how you can change your line endings:</p>
 
-<blockquote>git config --global core.autocrlf [false||true]</blockquote>
+<pre class="prettyprint">git config --global core.autocrlf [false||true]</pre>
 
 <p>On a side note - there is also the ability to create a text attribute file that Git can use to figure out what line endings you want, among other things. You can refer to this link for more information: <a href="http://bit.ly/L7GBDs">http://bit.ly/L7GBDs</a>.</p>
 
