@@ -1,3 +1,8 @@
+html body {
+  background-image: url("/assets/img/background/fabric-of-squares-gray.png");
+  background-repeat: repeat;
+}
+
 footer {
   text-align:center;
 }
