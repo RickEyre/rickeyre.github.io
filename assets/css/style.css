@@ -80,3 +80,7 @@ div.image-list > div, .image {
 .prettyprint {
   font-size: 0.8em;
 }
+
+.image-links > a:hover {
+  text-decoration: none;
+}
