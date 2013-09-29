@@ -17,30 +17,30 @@ footer {
 }
 
 h1 {
-  font-size: 40px;
+  font-size: 2.7em;
 }
 
 .main-header {
-  margin: 20px 0px 20px;
+  margin: 3% 0 3%;
 }
 
 .content {
-  padding-left: 40px;
-  padding-right: 40px;
+  padding-left: 5%;
+  padding-right: 5%;
 }
 
 .inline-content {
   display: block;
   margin-right: auto;
   margin-left: auto;
-  padding-top: 10px;
-  padding-bottom: 25px;
+  padding-top: 2%;
+  padding-bottom: 3%;
   max-width: 90%;
 }
 
 .tag-line {
   color:#999;
-  font-size: 20px;
+  font-size: 1.3em;
 }
 
 .small-tag-line {
@@ -66,15 +66,15 @@ div.image-list > div, .image {
 }
 
 .icon {
-  max-width: 30px;
-  margin-left: 10px;
-  margin-right: 10px;
+  max-width: 4.5%;
+  margin-left: 2%;
+  margin-right: 2%;
   display: inline-block;
 }
 
 .post-title {
-  margin-top: 1px;
-  margin-bottom: 15px;
+  margin-top: 0.1%;
+  margin-bottom: 2%;
 }
 
 .prettyprint {
