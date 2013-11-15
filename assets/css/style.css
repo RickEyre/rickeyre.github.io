@@ -85,11 +85,6 @@ div.image-list > div, .image {
   text-decoration: none;
 }
 
-.thumbnail {
+img {
   margin: 1%;
-  float: left;
-}
-
-.image-shrink {
-  max-width: 45%;
 }
