@@ -84,3 +84,12 @@ div.image-list > div, .image {
 .image-links > a:hover {
   text-decoration: none;
 }
+
+.thumbnail {
+  margin: 1%;
+  float: left;
+}
+
+.image-shrink {
+  max-width: 45%;
+}
