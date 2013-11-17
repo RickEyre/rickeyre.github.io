@@ -24,6 +24,14 @@ h1 {
   margin: 3% 0 3%;
 }
 
+.main-header > a:hover {
+  text-decoration: none;
+}
+
+.main-header > a {
+  display: block;
+}
+
 .content {
   padding-left: 5%;
   padding-right: 5%;
