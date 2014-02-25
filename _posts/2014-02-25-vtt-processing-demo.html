@@ -1,0 +1,79 @@
+---
+layout: post
+date: 2013-11-19 21:12:00 -0800
+title: Positioning WebVTT In Firefox
+tags:
+- mozilla
+- seneca college
+- open-source
+- cdot
+---
+
+<p>
+  The other day I landed the <a href="https://bugzilla.mozilla.org/865407">final patch</a>
+  to get positioning WebVTT in Firefox working. I'd like to share a demo today that I put
+  together to showcase some of the different position settings that Firefox now supports.
+  Note that you'll need to download <a href="http://nightly.mozilla.org/">Firefox Nightly</a>
+  for this to work correctly.
+</p>
+
+<p>
+  You can checkout the WebVTT file used to make this demo <a href="/assets/captions/such-webvtt.vtt">here</a>.
+</p>
+
+<p>
+  Enjoy!
+</p>
+
+<video class="inline-content" src="/assets/video/such-webvtt.webm" controls>
+  <track src="/assets/captions/such-webvtt.vtt" kind="subtitles" default />
+</video>
+
+<p>
+  Thank you to <a href="">Ali Al Dalla</a> for the video ;-).
+</p>
+
+<p>
+ The part of the spec that deals with positioning WebVTT cues is called the
+ <a href="http://dev.w3.org/html5/webvtt/#processing-model">processing model</a>
+ algorithm and it specifies where to position the cues based on the cue settings
+ that the author has set for each cue and also how to avoid overlap if two or more
+ cues overlap on the video. All this needs to be done manually&mdash;positioning boxes
+ absolutely&mdash;because the algorithm needs to behave deterministically across browsers.
+</p>
+
+<p>
+  The algorithm gets the positions for the various cues from the cue settings which
+  are:
+  <ul>
+    <li>Position&mdash;The position from the cue box anchor to where the cue sits on the video.</li>
+    <li>Size&mdash;The size of the cue in percent of the video.</li>
+    <li>Line&mdash;The line position on the video; Can be a percent or integer value.</li>
+    <li>Align&mdash;The text alignment of the cue.</li>
+    <li>Vertical&mdash;Specifies vertical or horizontal text.</li>
+  </ul>
+  Checkout the <a href="http://dev.w3.org/html5/webvtt/#webvtt-cue-settings-1">cue setting portion</a>
+  of the spec if you'd like to know more about the various cue settings.
+</p>
+
+<p>
+  Interestingly enough the hardest part about implementing this part of the standard
+  wasn't the spec itself, but getting the test suite working correctly. The main
+  problem for this is that our test suite isn't hosted in Gecko, but in the 
+  <a href="https://github.com/mozilla/vtt.js">vtt.js</a> repo and the algorithm
+  for positioning relies heavily on the positions of computed DOM elements. Since we
+  aren't running the test suite in Gecko we don't have access to a CSS layout engine,
+  which... was a problem.
+</p>
+
+<p>
+  I tried a lot of different solutions for getting the tests working in <code>vtt.js</code>
+  and settled on running our test suite with PhantomJS. In the future we'd like to move
+  it over to using something like <a href="https://ci.testling.com/">Testling</a> so that we can test <code>vtt.js</code>
+  as a polyfill for older browsers at the same time.
+</p>
+
+<p>
+  Next up is getting some kind of UI that can control subtitles and the resource
+  selection algorithm.
+</p>
