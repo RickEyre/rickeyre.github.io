@@ -1,0 +1,35 @@
+---
+layout: post
+date: 2014-03-28 11:21:00 -0500
+title: WebVTT (vtt.js) on Nodejs
+tags:
+- mozilla
+- seneca college
+- open-source
+- cdot
+---
+
+<p>
+  Good news! You can now use <code>vtt.js</code> on <code>Nodejs</code>. There
+  are two different ways you can get it on <code>npm</code>:
+</p>
+
+<ol>
+  <li>
+    You can install the basic <a href="https://www.npmjs.org/package/vtt.js">vtt.js
+    package</a> which just exports the <code>WebVTT</code>, <code>VTTCue</code>, and
+    <code>VTTRegion</code> implementations into a nice Node package for you. Using
+    this method you will have to provide your own <code>window</code> object for
+    <code>vtt.js</code> to run on. See the <a href="https://github.com/mozilla/vtt.js#vttjs">docs</a>
+    for more information.
+  </li>
+  <li>
+    You can install <a href="https://www.npmjs.org/package/node-vtt">node-vtt</a>
+    which is a Node wrapper for <code>vtt.js</code>. <code>node-vtt</code> runs
+    <code>vtt.js</code> on an instance of <code>PhantomJS</code>. This means that you
+    don't have to provide your own <code>window</code> object for <code>vtt.js</code>
+    since it will already be running in the context of a web page. It also provides
+    a couple of convenience functions such as <code>parseFile</code>, <code>processFile</code>,
+    and others. See the <a href="https://github.com/mozilla/node-vtt#node-vtt">docs</a> for more information.
+  </li>
+</ol>
