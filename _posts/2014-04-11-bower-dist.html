@@ -1,0 +1,78 @@
+---
+layout: post
+date: 2014-04-11 16:35:00 -0500
+title: Hosting your JavaScript library builds for Bower
+tags:
+- mozilla
+- seneca college
+- open-source
+- cdot
+---
+
+<p>
+  A while ago I <a href="http://rickeyre.ca/2013/11/16/vtt-bower.html">blogged</a>
+  about the troubles of hosting a pre-built distribution of vtt.js for <a href="http://bower.io/">Bower</a>.
+  The issue was that there is a build step we have to do to get a distributable
+  file that Bower can use. So we couldn't just point Bower at our repo and be
+  done with it as we weren't currently checking in the builds. I decided on hosting these builds in a separate
+  <a href="https://github.com/RickEyre/vtt.js-dist">repo</a> instead of checking the
+  builds into the main repo. However, this got troublesome after a while <strong>(as you might
+  be able to imagine)</strong> since I was building and commiting the Bower updates manually
+  instead of making a script like I should have. It might be a good thing that I didn't
+  end up automating it with a script since we decided to switch to hosting the builds
+  in the same repo as the source code.
+</p>
+
+<p>
+  The way I ended up solving this was to build a grunt task
+  that utilizes a number of other tasks to build and commit the files while bumping our library
+  version. This way we're not checking in new dist files with every little change
+  to the code. Dist files which won't even be available through Bower
+  or node because they're not attached to a particular version. We only need to build
+  and check in the dist files when we're ready to make a new release.
+</p>
+
+<p>
+  I called this grunt task <strong>release</strong> and it utilizes the
+  <a href="https://github.com/gruntjs/grunt-contrib-concat">grunt-contrib-concat</a>,
+  <a href="https://github.com/gruntjs/grunt-contrib-uglify">grunt-contrib-uglify</a>,
+  and <a href="https://github.com/vojtajina/grunt-bump">grunt-bump</a> modules.
+</p>
+
+<pre class="prettyprint">
+  grunt.registerTask( "build", [ "uglify:dist", "concat:dist" ] );
+
+  grunt.registerTask( "stage-dist", "Stage dist files.", function() {
+    exec( "git add dist/*", this.async() );
+  });
+
+  grunt.registerTask(
+    "release",
+    "Build the distributables and bump the version.",
+    function(arg) {
+      grunt.task.run( "build", "stage-dist", "bump:" + arg );
+    }
+  );
+</pre>
+
+<p>
+  I've also separated out builds into dev builds and dist builds. This way
+  in the normal course of development we don't build dist files which are
+  tracked by git and have to worry about not commiting those changes. Which would
+  be the case because our test suite needs to build the library in order to
+  test it.
+</p>
+
+<pre class="prettyprint">
+  grunt.registerTask( "build", [ "uglify:dist", "concat:dist" ] );
+  grunt.registerTask( "dev-build", [ "uglify:dev", "concat:dev" ])
+  grunt.registerTask( "default", [ "jshint", "dev-build" ]);
+</pre>
+
+<p>
+  Then when we're ready to make a new release with a new dist we would just run.
+</p>
+
+<pre class="prettyprint">
+  grunt release:patch // Or major or minor if we want too.
+</pre>
