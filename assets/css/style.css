@@ -1,6 +1,7 @@
 html body {
-  background-image: url("/assets/img/background/fabric-of-squares-gray.png");
-  background-repeat: repeat;
+  font-size: 18px;
+  font-family: "PT Serif",serif;
+  color: #555555;
 }
 
 hr {
@@ -20,18 +21,6 @@ h1 {
   font-size: 2.7em;
 }
 
-.main-header {
-  margin: 3% 0 3%;
-}
-
-.main-header > a:hover {
-  text-decoration: none;
-}
-
-.main-header > a {
-  display: block;
-}
-
 .content {
   padding-left: 5%;
   padding-right: 5%;
@@ -44,11 +33,6 @@ h1 {
   padding-top: 2%;
   padding-bottom: 3%;
   max-width: 90%;
-}
-
-.tag-line {
-  color:#999;
-  font-size: 1.3em;
 }
 
 .small-tag-line {
@@ -83,10 +67,6 @@ div.image-list > div, .image {
 .post-title {
   margin-top: 0.1%;
   margin-bottom: 2%;
-}
-
-.prettyprint {
-  font-size: 0.8em;
 }
 
 .image-links > a:hover {

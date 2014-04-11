@@ -7,8 +7,7 @@ pygments: true
 paginate: 5
 
 # Site wide variables
-title: Technological Ramblings
-tagline: The word of Rick Eyre on topics relating to software... and other things.
+title: Rick Eyre's Blog
 
 # Contact Info
 gh: https://github.com/RickEyre
