@@ -46,13 +46,9 @@ tags:
     exec( "git add dist/*", this.async() );
   });
 
-  grunt.registerTask(
-    "release",
-    "Build the distributables and bump the version.",
-    function(arg) {
-      grunt.task.run( "build", "stage-dist", "bump:" + arg );
-    }
-  );
+  grunt.registerTask("release", "Build the distributables and bump the version.", function(arg) {
+    grunt.task.run( "build", "stage-dist", "bump:" + arg );
+  });
 </pre>
 
 <p>
