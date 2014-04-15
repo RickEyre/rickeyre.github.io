@@ -1,0 +1,95 @@
+---
+layout: post
+date: 2014-04-15 14:45:00 -0500
+title: Getting the number of lines of text in an Element
+tags:
+- mozilla
+- seneca college
+- open-source
+- cdot
+---
+
+<p>
+  One of the biggest problems I faced when developing <a href="https://github.com/mozilla/vtt.js">vtt.js</a>
+  is that a lot of the layout algorithm depends on being able to know the line
+  height of the subtitle text. This boils down to being able to know the line
+  height of the div within which the subtitle text sits. A lot of
+  the time this is easy to get:
+</p>
+
+<pre class="prettyprint">
+  var lineHeight = div.style.lineHeight;
+</pre>
+
+<p>
+  But, what if you haven't set a line height? Then you would need to get the
+  computed value of the line height:
+</p>
+
+<pre class="prettyprint">
+  var lineHeight = window.getComputedStyle(null, div).getPropertyValue("lineHeight");
+</pre>
+
+<p>
+  This works... some of the time. On some browsers if you try to get the computed
+  value of the line height and you haven't explicitly set a line height, the computed
+  property will return back as the value <strong>normal</strong>. That's helpful...
+</p>
+
+<p>
+  After much searching I found out that you if you use
+  <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element.getClientRects">getClientRects</a>
+  on an <strong>inline</strong> element it will return you a
+  <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIDOMClientRect">TextRectangle</a>
+  box for each line of text in the inline element. At that point you can either
+  assume that each line has the same height and get just use the <strong>height</strong>
+  property of the first <strong>TextRectangle</strong> or to get a somewhat more
+  accurate number you can take the height of the inline element and divide it by
+  the number of TextRectangles you have.
+</p>
+
+<pre class="prettyprint">
+  var inlineElement = document.getElementById("myInlineElement"),
+      textRectangles = inlineElement.getClientRects(),
+      container = inlineElement.getBoundingClientRect(),
+      lineHeight = container.height / textRectangles.length;
+
+  alert("The average line height is: " + lineHeight);
+</pre>
+
+<p>
+  This works really well for the amount of actual code you need to write. I've read
+  about more accurate methods, but they take some serious coding. Like walking through
+  each character in the text and tracking when overflow happens serious.
+</p>
+
+<p>
+  Now back to my original question which was how to get the number of lines of
+  text in a div <strong>(block level)</strong> element. The way I did this was to wrap my div
+  which has my content in another div, and set the inner
+  div's display property to <strong>inline</strong>. Then you can calculate the
+  line height/number of lines of text of the inner div since it has inline display.
+  This way you retain your contents block level layout while being able to figure
+  out how many lines of text it is.
+</p>
+
+<p>
+  This is it all put together:
+</p>
+
+<pre class="prettyprint">
+  &lt;div&gt;
+    &lt;div id="content" style="display:inline;"&gt;
+      This is all my content in here. I wonder how many lines it is?
+    &lt;/div&gt;
+  &lt;/div&gt;
+</pre>
+
+<pre class="prettyprint">
+  var inlineElement = document.getElementById("content"),
+      textRectangles = inlineElement.getClientRects(),
+      container = inlineElement.getBoundingClientRect(),
+      lineHeight = container.height / textRectangles.length;
+
+  alert("The average line height is: " + lineHeight);
+</pre>
