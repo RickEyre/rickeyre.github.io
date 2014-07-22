@@ -1,0 +1,39 @@
+---
+layout: post
+date: 2014-07-22 19:00:00 -0500
+title: WebVTT Released in Firefox 31
+tags:
+- mozilla
+- open-source
+---
+
+<p>
+  If you haven't seen the release notes WebVTT has finally been
+  <a href="https://www.mozilla.org/en-US/firefox/31.0/releasenotes/">released in Firefox 31.</a>
+  I'm super excited about this as it's the culmination of a lot of my own and countless others'
+  work over the last two years. Especially since it has been delayed for releases 29 and 30.
+</p>
+
+<p>
+  That being said, there are still a few known major bugs with WebVTT in Firefox 31:
+  <ul>
+    <li>
+      TextTrackCue enter, exit, and change events do not work yet. I'm working on getting
+      them done now.
+    </li>
+    <li>
+      WebVTT subtitles do not show on audio only elements yet. This will probably be what is tackled
+      after the TextTrackCue events.
+    </li>
+    <li>
+      There is no support for any in-band TextTrack WebVTT data yet. If your a video or
+      audio codec developer that wants in-band WebVTT to work in Firefox, please help out :-).
+    </li>
+    <li>
+      Oh, and there is no UI on the HTML5 Video element to control subtitles... not the most
+      convenient, but it's currently being worked on as well.
+    </li>
+  </ul>
+  I do expect the bugs to start rolling in as well and I'm actually kind of looking
+  forward to that as it will help improve WebVTT in Firefox.
+</p>
