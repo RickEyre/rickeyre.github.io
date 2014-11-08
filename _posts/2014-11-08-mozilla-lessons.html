@@ -1,0 +1,132 @@
+---
+layout: post
+date: 2014-11-11 10:30:00 -0500
+title: Lessons on Best Practices from Mozilla
+tags:
+- mozilla
+- open-source
+- cdot
+- development processes
+---
+
+<p>
+  One of the ways we facilitate improvement in development processes and the like
+  at EventMobi is by having lunch and learns where someone will present on something
+  interesting. Sometimes that's a cool technology they've used or a good development
+  practice they've discovered or have had experience with. To that end I gave a
+  presentation on some of the lessons I've learnt on best practices while working
+  in the Mozilla open-source community.
+</p>
+
+<p>
+  Allthough many of these best practices may seem like no brainers to seasoned
+  developers, I still hear way to many horror stories through the grapevine about
+  software being built under seriously bad conditions. So, without further ado.
+</p>
+
+<h3>Code Ownership</h3>
+
+<p>
+  One of the things I think Mozilla does really well is the idea of code ownership.
+  This essentially means identifying those who have a level of knowledge about a
+  particular area or module of code and thrusting upon them the responsibility
+  to oversee it. From a practical point of view this means answering questions
+  about the module that others have and also reviewing all of the changes that
+  are being made to the module in order to ensure that they are sane and fit
+  into the larger architecture of the module as a whole.
+</p>
+
+<p>
+  Mozilla does this really well by having clear definitions of <a href="https://www.mozilla.org/hacking/module-ownership.html">what</a>
+  code ownership means, <a href="https://wiki.mozilla.org/Modules">who</a> code owners are,
+  and <a href="https://wiki.mozilla.org/Modules/Core">who</a> in the owners absence,
+  can make decisions about that module.
+</p>
+
+<p>
+  The key part to this set up in my opinion is that it makes it clear what the
+  requirements to become a code owner are and what their responsibilities are as a
+  code owner. Too often I feel like, as with other things, if they aren't formalized
+  they become subject to, well, subjectivity. And the details of code ownership
+  and responsibility get lost in translation and hence, not enacted.
+</p>
+
+<p>
+  Bottom line, <strong><em>formalizing your code ownership policies and processes are
+  a foundation for success</em></strong>. Without that it becomes unclear even who to ask to
+  review code, is it the person in the blame? Possibly. Maybe not. Maybe that person
+  didn't make correct changes, or made changes under the guidance of someone else.
+  Maybe the code your changing has never even had a true 'owner'. No one knows the
+  big picture for that piece of code and so no one knows enough about it to make
+  informed decisions. That's a problem. If a code owner had been designated when
+  that code was written that would never have been an issue.
+</p>
+
+<h3>Testing</h3>
+
+<p>
+  We all know testing is a must for any sane development process. What I've learned
+  through Mozilla is that having an <strong><em>insane</em></strong> amount of tests is okay.
+  And honestly, preferable to just enough. As just enough is hard to gauge. The
+  more tests I have in general, the more confident I feel in my code. Having a
+  gauntlet of tests for your code makes it that much stronger.
+</p>
+
+<p>
+  Not only that, but it's important to be staying on top of tests. As a rule, not
+  accepting code before it has a test and adding regression tests for bugs that are
+  fixed. In exceptional cases code can merged without tests, but it should be
+  tracked so that tests for it will be added later. Ten minutes spent writing a
+  test now could save hours of developer time in the future tracking down bugs.
+</p>
+
+<h3>Saying No</h3>
+
+<p>
+  This is one of my personal favourites. And especially relevant I think in companies
+  which are, in my experience, more driven to say <strong><em>yes</em></strong>&mdash;in order to hit that
+  extra profit margin, to please that extra customer, to do whatever&mdash;as opposed
+  to open-source projects who are able to say no because most of the time they have
+  no deadline. They're driven by desire to build that next cool thing, to build it
+  well, and to do it in a sane way.
+</p>
+
+<p>
+  From my experience working in Mozilla's and other open-source communities
+  I've found it's important to say no when a feature isn't ready, when it's not good
+  enough yet, when it needs an extra test, when it's not necessary, or when you just
+  ain't got no time for that. I do think, however, that it's hard to say no sometimes
+  while working under the constraints of a profit driven process. There is a healthy
+  balance one can achieve though. We have to strive to achieve this zen like state.
+</p>
+
+<h3>Managing Technical Debt</h3>
+
+<p>
+  One of the main ways I've seen this done is by ceating tickets for everything.
+  See something off about the code? Log a ticket. See something in need of
+  refactoring? Log a ticket. See something that needs a test? Log a ticket. Any
+  kind of piece of work that you think needs to get done, any kind of open
+  question that needs to be answered about the state of the code, log a ticket
+  for it.
+</p>
+
+<p>
+  Logging tickets for the problem gives it visibility and documents it somewhere.
+  This enables a few things to happen. It enables communication about
+  the state of your code base across your team and makes that information
+  easily accessible as it's documented in your tracking system. It also puts
+  the problems that are not necessarily bugs&mdash;your stinky, ugly, untested code,
+  or otherwise&mdash;to be in your teams face all the time. It's not just getting
+  swept under the rug and not being paid attention too. It forces your team to
+  deal with it and be aware of it.
+</p>
+
+<p>
+  The key part of this strategy then becomes managing all these tickets and attempting
+  to understand what they are telling you. One of the ways you can do this is by
+  doing regular triages. This means going through the open tickets and getting an
+  idea of what state your code is in and prioritizing how to go about fixing it.
+  This is key as it turns the information that your team has been generating into
+  something actionable and something that you can learn from.
+</p>
