@@ -3,7 +3,7 @@ markdown: rdiscount
 permalink: date
 exclude: [README.md]
 timezone: America/Toronto
-highlighter: true
+pygments: true
 paginate: 5
 
 # Site wide variables
